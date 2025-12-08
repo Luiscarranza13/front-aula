@@ -30,7 +30,10 @@ export default function GlobalSearch({ isOpen, onClose }) {
   }, [onClose]);
 
   useEffect(() => {
-    if (query.length < 2) { setResults({ courses: [], tasks: [], forums: [], users: [] }); return; }
+    if (query.length < 2) { 
+      Promise.resolve().then(() => setResults({ courses: [], tasks: [], forums: [], users: [] }));
+      return;
+    }
     const search = async () => {
       setLoading(true);
       try {

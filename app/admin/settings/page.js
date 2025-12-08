@@ -36,11 +36,13 @@ export default function AdminSettingsPage() {
 
   useEffect(() => {
     if (user) {
-      setProfileData(prev => ({
-        ...prev,
-        nombre: user.nombre || '',
-        email: user.email || ''
-      }));
+      Promise.resolve().then(() => {
+        setProfileData(prev => ({
+          ...prev,
+          nombre: user.nombre || '',
+          email: user.email || ''
+        }));
+      });
     }
     
     const savedTheme = localStorage.getItem('theme') || 'system';

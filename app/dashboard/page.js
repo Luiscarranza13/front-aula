@@ -300,10 +300,10 @@ export default function DashboardPage() {
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold tracking-tight">Mis Cursos</h2>
-          <a href="/courses" className="text-sm text-primary hover:underline flex items-center gap-1">
+          <Link href="/courses" className="text-sm text-primary hover:underline flex items-center gap-1">
             Ver todos
             <ArrowUpRight className="h-4 w-4" />
-          </a>
+          </Link>
         </div>
         {courses.length === 0 ? (
           <Card>

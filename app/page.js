@@ -321,7 +321,7 @@ export default function LandingPage() {
                     <Star key={j} className="w-4 h-4 text-amber-400 fill-amber-400" />
                   ))}
                 </div>
-                <p className="text-slate-700 mb-6 leading-relaxed">"{testimonial.text}"</p>
+                <p className="text-slate-700 mb-6 leading-relaxed">&ldquo;{testimonial.text}&rdquo;</p>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-slate-300 flex items-center justify-center text-slate-600 font-semibold text-sm">
                     {testimonial.name.split(' ').map(n => n[0]).join('')}

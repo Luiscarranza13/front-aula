@@ -21,10 +21,21 @@ export default function CardCurso({ curso }) {
   
   const color = colors[colorIndex];
   
+  // Función determinística para generar valores pseudo-aleatorios basados en ID
+  const seededValue = (seed, max) => {
+    let hash = 0;
+    const str = String(curso.id) + seed;
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) - hash) + str.charCodeAt(i);
+      hash = hash & hash;
+    }
+    return Math.abs(hash) % max;
+  };
+  
   // Progreso simulado (en producción vendría del backend)
-  const progress = useMemo(() => Math.floor(Math.random() * 60) + 40, [curso.id]);
-  const tasksCompleted = useMemo(() => Math.floor(Math.random() * 8) + 2, [curso.id]);
-  const totalTasks = useMemo(() => tasksCompleted + Math.floor(Math.random() * 5) + 1, [tasksCompleted]);
+  const progress = useMemo(() => seededValue(':p', 60) + 40, [curso.id]);
+  const tasksCompleted = useMemo(() => seededValue(':t', 8) + 2, [curso.id]);
+  const totalTasks = useMemo(() => tasksCompleted + seededValue(':tot', 5) + 1, [curso.id, tasksCompleted]);
 
   return (
     <Link href={`/courses/${curso.id}`} className="block group">
