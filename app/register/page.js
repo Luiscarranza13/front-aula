@@ -37,7 +37,7 @@ export default function RegisterPage() {
       await createUser({
         nombre: formData.nombre,
         email: formData.email,
-        password: formData.password,
+        contraseña: formData.password,
         rol: formData.rol
       });
       setSuccess(true);
