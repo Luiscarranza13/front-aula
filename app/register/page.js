@@ -16,7 +16,7 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    nombre: '', email: '', password: '', confirmPassword: '', rol: 'estudiante'
+    nombre: '', email: '', password: '', confirmPassword: ''
   });
 
   const handleSubmit = async (e) => {
@@ -37,8 +37,7 @@ export default function RegisterPage() {
       await createUser({
         nombre: formData.nombre,
         email: formData.email,
-        contraseña: formData.password,
-        rol: formData.rol
+        contraseña: formData.password
       });
       setSuccess(true);
       setTimeout(() => router.push('/login'), 2000);

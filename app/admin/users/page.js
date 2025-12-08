@@ -151,6 +151,7 @@ export default function AdminUsersPage() {
   const getRoleConfig = (rol) => {
     const configs = {
       admin: { color: 'bg-red-500', badge: 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400', icon: Shield },
+      profesor: { color: 'bg-blue-500', badge: 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400', icon: Users },
       docente: { color: 'bg-blue-500', badge: 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400', icon: Users },
       estudiante: { color: 'bg-green-500', badge: 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400', icon: Users }
     };
@@ -160,7 +161,7 @@ export default function AdminUsersPage() {
   const stats = {
     total: users.length,
     admins: users.filter(u => u.rol === 'admin').length,
-    docentes: users.filter(u => u.rol === 'docente').length,
+    profesores: users.filter(u => u.rol === 'profesor' || u.rol === 'docente').length,
     estudiantes: users.filter(u => u.rol === 'estudiante').length,
   };
 
@@ -206,8 +207,8 @@ export default function AdminUsersPage() {
         </Card>
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-0 shadow-sm">
           <CardContent className="p-4">
-            <div className="text-3xl font-bold text-blue-600">{stats.docentes}</div>
-            <div className="text-sm text-blue-600/70">Docentes</div>
+            <div className="text-3xl font-bold text-blue-600">{stats.profesores}</div>
+            <div className="text-sm text-blue-600/70">Profesores</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-0 shadow-sm">
@@ -229,7 +230,7 @@ export default function AdminUsersPage() {
             className="px-4 py-2 border rounded-xl bg-white dark:bg-gray-800 text-sm h-11">
             <option value="">Todos los roles</option>
             <option value="admin">Administradores</option>
-            <option value="docente">Docentes</option>
+            <option value="profesor">Profesores</option>
             <option value="estudiante">Estudiantes</option>
           </select>
           <div className="flex border rounded-xl overflow-hidden">
@@ -417,9 +418,12 @@ export default function AdminUsersPage() {
             <select value={formData.rol} onChange={(e) => setFormData({ ...formData, rol: e.target.value })}
               className="w-full h-11 px-4 border border-gray-200 rounded-xl bg-white dark:bg-gray-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20">
               <option value="estudiante">Estudiante</option>
-              <option value="docente">Docente</option>
+              <option value="profesor">Profesor</option>
               <option value="admin">Administrador</option>
             </select>
+            <p className="text-xs text-muted-foreground">
+              Solo el administrador puede cambiar roles de usuarios
+            </p>
           </div>
 
           <ModalFooter>

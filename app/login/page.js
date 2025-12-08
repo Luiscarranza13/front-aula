@@ -83,7 +83,8 @@ export default function LoginPage() {
         localStorage.removeItem('rememberedEmail');
       }
       
-      login(data.user);
+      // Guardar usuario y token
+      login(data.user, data.access_token);
       router.push('/dashboard');
     } catch (err) {
       setError(err.message || 'Error al iniciar sesión');

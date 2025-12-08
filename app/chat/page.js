@@ -34,6 +34,7 @@ export default function ChatPage() {
   const [lastMessageId, setLastMessageId] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
   const [newMessageNotification, setNewMessageNotification] = useState(null);
+  const [showSidebar, setShowSidebar] = useState(false);
   const pollingRef = useRef(null);
   const notificationTimeoutRef = useRef(null);
 
@@ -171,6 +172,7 @@ export default function ChatPage() {
   const selectPrivateChat = async (otherUser) => {
     setSelectedUser(otherUser);
     setChatMode('private');
+    setShowSidebar(false); // Cerrar sidebar en móvil
     setLoading(true);
     try {
       const msgs = await getPrivateChatMessages(user.id, otherUser.id, 50);
@@ -234,36 +236,36 @@ export default function ChatPage() {
   if (loading && messages.length === 0) return <DashboardSkeleton />;
 
   return (
-    <div className="h-[calc(100vh-7rem)] flex gap-4 p-4 relative">
+    <div className="h-[calc(100vh-7rem)] flex gap-4 p-2 md:p-4 relative">
       {/* Notificación flotante de nuevo mensaje */}
       {newMessageNotification && (
-        <div className="fixed top-20 right-4 z-50 animate-in slide-in-from-right duration-300">
-          <Card className="w-80 shadow-2xl border-l-4 border-l-indigo-500 bg-white dark:bg-slate-900">
-            <CardContent className="p-4">
-              <div className="flex items-start gap-3">
+        <div className="fixed top-20 right-2 md:right-4 z-50 animate-in slide-in-from-right duration-300 max-w-[calc(100vw-1rem)]">
+          <Card className="w-full md:w-80 shadow-2xl border-l-4 border-l-indigo-500 bg-white dark:bg-slate-900">
+            <CardContent className="p-3 md:p-4">
+              <div className="flex items-start gap-2 md:gap-3">
                 <div className="relative">
-                  <Avatar className="h-10 w-10 ring-2 ring-indigo-500/20">
+                  <Avatar className="h-8 w-8 md:h-10 md:w-10 ring-2 ring-indigo-500/20">
                     <AvatarImage src={getAvatarUrl(newMessageNotification.remitente?.avatar)} />
-                    <AvatarFallback className={`bg-gradient-to-br ${getRoleColor(newMessageNotification.remitente?.rol)} text-white text-sm font-medium`}>
+                    <AvatarFallback className={`bg-gradient-to-br ${getRoleColor(newMessageNotification.remitente?.rol)} text-white text-xs md:text-sm font-medium`}>
                       {getInitials(newMessageNotification.remitente?.nombre)}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="absolute -top-1 -right-1 flex h-4 w-4">
+                  <span className="absolute -top-1 -right-1 flex h-3 w-3 md:h-4 md:w-4">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                    <Bell className="relative h-4 w-4 text-indigo-600" />
+                    <Bell className="relative h-3 w-3 md:h-4 md:w-4 text-indigo-600" />
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="font-semibold text-sm truncate">{newMessageNotification.remitente?.nombre}</p>
+                    <p className="font-semibold text-xs md:text-sm truncate">{newMessageNotification.remitente?.nombre}</p>
                     <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${getRoleBadgeColor(newMessageNotification.remitente?.rol)}`}>
                       {newMessageNotification.remitente?.rol}
                     </span>
                   </div>
-                  <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{newMessageNotification.contenido}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Ahora mismo</p>
+                  <p className="text-xs md:text-sm text-muted-foreground line-clamp-2 mt-1">{newMessageNotification.contenido}</p>
+                  <p className="text-[10px] md:text-xs text-muted-foreground mt-1">Ahora mismo</p>
                 </div>
-                <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0" onClick={() => setNewMessageNotification(null)}>
+                <Button variant="ghost" size="icon" className="h-5 w-5 md:h-6 md:w-6 shrink-0" onClick={() => setNewMessageNotification(null)}>
                   ×
                 </Button>
               </div>
@@ -272,8 +274,8 @@ export default function ChatPage() {
         </div>
       )}
 
-      {/* Sidebar de usuarios */}
-      <Card className="w-80 flex-shrink-0 flex flex-col overflow-hidden shadow-xl border-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl">
+      {/* Sidebar de usuarios - Responsive */}
+      <Card className={`${showSidebar ? 'fixed inset-0 z-40' : 'hidden'} md:relative md:flex md:w-80 flex-shrink-0 flex-col overflow-hidden shadow-xl border-0 bg-white dark:bg-slate-900 md:bg-white/80 md:dark:bg-slate-900/80 md:backdrop-blur-xl`}>
         <CardHeader className="pb-3 border-b bg-gradient-to-r from-indigo-500/10 to-purple-500/10">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -285,9 +287,15 @@ export default function ChatPage() {
                 <p className="text-xs text-muted-foreground">{users.length} usuarios activos</p>
               </div>
             </div>
-            {unreadCount > 0 && (
-              <Badge className="bg-red-500 text-white animate-pulse">{unreadCount}</Badge>
-            )}
+            <div className="flex items-center gap-2">
+              {unreadCount > 0 && (
+                <Badge className="bg-red-500 text-white animate-pulse">{unreadCount}</Badge>
+              )}
+              {/* Botón cerrar sidebar móvil */}
+              <Button variant="ghost" size="icon" onClick={() => setShowSidebar(false)} className="md:hidden rounded-xl">
+                ×
+              </Button>
+            </div>
           </div>
         </CardHeader>
         
@@ -386,22 +394,27 @@ export default function ChatPage() {
         {/* Header del chat */}
         <CardHeader className="pb-3 border-b flex-shrink-0 bg-gradient-to-r from-indigo-500/5 to-purple-500/5">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 md:gap-3">
+              {/* Botón menú móvil */}
+              <Button variant="ghost" size="icon" onClick={() => setShowSidebar(true)} className="md:hidden rounded-xl shrink-0">
+                <Users className="h-5 w-5" />
+              </Button>
+              
               {chatMode === 'private' && selectedUser && (
-                <Button variant="ghost" size="icon" onClick={goToGlobalChat} className="md:hidden rounded-xl">
+                <Button variant="ghost" size="icon" onClick={goToGlobalChat} className="md:hidden rounded-xl shrink-0">
                   <ChevronLeft className="h-5 w-5" />
                 </Button>
               )}
               {chatMode === 'global' ? (
                 <>
-                  <div className="p-3 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-lg shadow-indigo-500/25">
-                    <Globe className="h-6 w-6 text-white" />
+                  <div className="p-2 md:p-3 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl md:rounded-2xl shadow-lg shadow-indigo-500/25 shrink-0">
+                    <Globe className="h-5 w-5 md:h-6 md:w-6 text-white" />
                   </div>
-                  <div>
-                    <h3 className="font-bold text-lg">Chat Global</h3>
+                  <div className="min-w-0">
+                    <h3 className="font-bold text-base md:text-lg truncate">Chat Global</h3>
                     <div className="flex items-center gap-2">
                       <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                      <p className="text-sm text-muted-foreground">{users.length + 1} participantes en línea</p>
+                      <p className="text-xs md:text-sm text-muted-foreground truncate">{users.length + 1} participantes en línea</p>
                     </div>
                   </div>
                 </>
@@ -434,7 +447,7 @@ export default function ChatPage() {
         </CardHeader>
 
         {/* Área de mensajes */}
-        <CardContent className="flex-1 overflow-auto p-4 space-y-4 bg-gradient-to-b from-gray-50/50 to-white dark:from-slate-800/50 dark:to-slate-900">
+        <CardContent className="flex-1 overflow-auto p-2 md:p-4 space-y-2 md:space-y-4 bg-gradient-to-b from-gray-50/50 to-white dark:from-slate-800/50 dark:to-slate-900">
           {messages.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-muted-foreground">
               <div className="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center mb-4">
