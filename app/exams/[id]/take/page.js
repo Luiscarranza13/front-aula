@@ -11,7 +11,7 @@ import { DashboardSkeleton } from '@/components/Skeleton';
 import { 
   Clock, AlertTriangle, CheckCircle, ChevronLeft, ChevronRight, 
   Send, FileQuestion, AlertCircle
-} from 'lucide-react';} from 'lucide-react';
+} from 'lucide-react';
 
 export default function TakeExamPage() {
   const { id } = useParams();
