@@ -46,7 +46,7 @@ export default function AdminSettingsPage() {
     }
     
     const savedTheme = localStorage.getItem('theme') || 'system';
-    setTheme(savedTheme);
+    Promise.resolve().then(() => setTheme(savedTheme));
   }, [user]);
 
   const showNotificationMessage = (message, type = 'success') => {

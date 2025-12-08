@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { getCourses, getDashboardStats, getWeeklyActivity, getTaskDistribution, getMonthlyProgress } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import CardCurso from '@/components/CardCurso';

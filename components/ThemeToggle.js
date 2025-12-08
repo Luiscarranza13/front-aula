@@ -8,13 +8,6 @@ export default function ThemeToggle() {
   const [theme, setTheme] = useState('system');
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-    const savedTheme = localStorage.getItem('theme') || 'system';
-    setTheme(savedTheme);
-    applyTheme(savedTheme);
-  }, []);
-
   const applyTheme = (newTheme) => {
     const root = document.documentElement;
     
@@ -25,6 +18,15 @@ export default function ThemeToggle() {
       root.classList.toggle('dark', newTheme === 'dark');
     }
   };
+
+  useEffect(() => {
+    setMounted(true);
+    const savedTheme = localStorage.getItem('theme') || 'system';
+    Promise.resolve().then(() => {
+      setTheme(savedTheme);
+      applyTheme(savedTheme);
+    });
+  }, []);
 
   const toggleTheme = () => {
     const themes = ['light', 'dark', 'system'];

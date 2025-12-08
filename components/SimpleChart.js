@@ -37,32 +37,34 @@ export function DonutChart({ data, size = 150, strokeWidth = 20 }) {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   
-  let currentOffset = 0;
+  const segments = useMemo(() => {
+    let offset = 0;
+    return data.map((item) => {
+      const percent = item.value / total;
+      const strokeDasharray = `${circumference * percent} ${circumference}`;
+      const strokeDashoffset = -offset;
+      offset += circumference * percent;
+      return { ...item, strokeDasharray, strokeDashoffset };
+    });
+  }, [data, total, circumference]);
   
   return (
     <div className="relative" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="transform -rotate-90">
-        {data.map((item, idx) => {
-          const percent = item.value / total;
-          const strokeDasharray = `${circumference * percent} ${circumference}`;
-          const strokeDashoffset = -currentOffset;
-          currentOffset += circumference * percent;
-          
-          return (
-            <circle
-              key={idx}
-              cx={size / 2}
-              cy={size / 2}
-              r={radius}
-              fill="none"
-              stroke={item.color}
-              strokeWidth={strokeWidth}
-              strokeDasharray={strokeDasharray}
-              strokeDashoffset={strokeDashoffset}
-              className="transition-all duration-500"
-            />
-          );
-        })}
+        {segments.map((item, idx) => (
+          <circle
+            key={idx}
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            stroke={item.color}
+            strokeWidth={strokeWidth}
+            strokeDasharray={item.strokeDasharray}
+            strokeDashoffset={item.strokeDashoffset}
+            className="transition-all duration-500"
+          />
+        ))}
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="text-center">
