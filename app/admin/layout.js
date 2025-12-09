@@ -31,7 +31,7 @@ export default function AdminLayout({ children }) {
       <Navbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
       <div className="flex">
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <main className="flex-1 md:ml-64 pt-16 p-4 md:p-8 transition-all duration-300">
+        <main className="flex-1 md:ml-64 pt-16 px-3 py-4 md:px-6 md:py-6 lg:p-8 transition-all duration-300">
           <div className="max-w-7xl mx-auto">
             {children}
           </div>

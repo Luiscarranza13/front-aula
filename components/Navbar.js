@@ -84,12 +84,13 @@ export default function Navbar({ onMenuClick }) {
         </div>
 
         {/* Search bar */}
-        <div className="flex-1 flex items-center justify-center px-4 max-w-2xl mx-auto">
+        <div className="flex-1 flex items-center justify-center px-2 md:px-4 max-w-2xl mx-auto">
           <button onClick={() => setSearchOpen(true)}
-            className="w-full h-10 pl-10 pr-4 rounded-lg border border-input bg-background/50 text-sm text-left text-muted-foreground hover:bg-accent transition-all relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" />
-            <span>Buscar... </span>
-            <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden md:inline-flex h-5 items-center gap-1 rounded border bg-muted px-1.5 text-[10px] font-medium">
+            className="w-full h-8 md:h-10 pl-8 md:pl-10 pr-3 md:pr-4 rounded-lg border border-input bg-background/50 text-xs md:text-sm text-left text-muted-foreground hover:bg-accent transition-all relative">
+            <Search className="absolute left-2 md:left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 md:h-4 md:w-4" />
+            <span className="hidden sm:inline">Buscar... </span>
+            <span className="sm:hidden">Buscar</span>
+            <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden lg:inline-flex h-5 items-center gap-1 rounded border bg-muted px-1.5 text-[10px] font-medium">
               ⌘K
             </kbd>
           </button>
@@ -98,26 +99,26 @@ export default function Navbar({ onMenuClick }) {
         <GlobalSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
 
         {/* Right side actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 md:gap-2">
           <ThemeToggle />
 
           {/* Chat button */}
-          <Button variant="ghost" size="icon" className="rounded-full relative hover:bg-accent"
+          <Button variant="ghost" size="icon" className="rounded-full relative hover:bg-accent h-8 w-8 md:h-10 md:w-10"
             onClick={() => router.push('/chat')}>
-            <MessageCircle className="h-5 w-5" />
+            <MessageCircle className="h-4 w-4 md:h-5 md:w-5" />
             {chatUnreadCount > 0 && (
-              <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs bg-indigo-500 animate-pulse">
+              <Badge className="absolute -top-0.5 -right-0.5 md:-top-1 md:-right-1 h-4 w-4 md:h-5 md:w-5 flex items-center justify-center p-0 text-[10px] md:text-xs bg-indigo-500 animate-pulse">
                 {chatUnreadCount > 9 ? '9+' : chatUnreadCount}
               </Badge>
             )}
           </Button>
 
           {/* Notifications button */}
-          <Button variant="ghost" size="icon" className="rounded-full relative hover:bg-accent"
+          <Button variant="ghost" size="icon" className="rounded-full relative hover:bg-accent h-8 w-8 md:h-10 md:w-10"
             onClick={() => router.push('/notifications')}>
-            <Bell className="h-5 w-5" />
+            <Bell className="h-4 w-4 md:h-5 md:w-5" />
             {unreadCount > 0 && (
-              <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs bg-red-500">
+              <Badge className="absolute -top-0.5 -right-0.5 md:-top-1 md:-right-1 h-4 w-4 md:h-5 md:w-5 flex items-center justify-center p-0 text-[10px] md:text-xs bg-red-500">
                 {unreadCount > 9 ? '9+' : unreadCount}
               </Badge>
             )}
@@ -126,14 +127,14 @@ export default function Navbar({ onMenuClick }) {
           {user && (
             <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 gap-2 rounded-full px-2 hover:bg-accent">
-                  <Avatar className="h-8 w-8 ring-2 ring-background">
+                <Button variant="ghost" className="relative h-8 md:h-10 gap-0 md:gap-2 rounded-full px-1 md:px-2 hover:bg-accent">
+                  <Avatar className="h-7 w-7 md:h-8 md:w-8 ring-2 ring-background">
                     {user.avatar && <AvatarImage src={user.avatar} alt={user.nombre} />}
-                    <AvatarFallback className={`${getRoleColor(user.rol)} text-white font-semibold text-xs`}>
+                    <AvatarFallback className={`${getRoleColor(user.rol)} text-white font-semibold text-[10px] md:text-xs`}>
                       {getInitials(user.nombre)}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="hidden md:flex flex-col items-start text-left">
+                  <div className="hidden lg:flex flex-col items-start text-left">
                     <span className="text-sm font-medium">{user.nombre}</span>
                     <span className="text-xs text-muted-foreground capitalize">{user.rol}</span>
                   </div>

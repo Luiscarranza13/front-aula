@@ -135,57 +135,62 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
             Bienvenido, {user?.nombre?.split(' ')[0]} 👋
           </h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-sm md:text-base text-muted-foreground mt-1 md:mt-2">
             Aquí está tu resumen académico de hoy
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-            Actualizar
+            <RefreshCw className={`h-4 w-4 md:mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+            <span className="hidden md:inline">Actualizar</span>
           </Button>
-          <Badge variant="outline" className="gap-1">
+          <Badge variant="outline" className="gap-1 text-xs">
             <Calendar className="h-3 w-3" />
-            {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
+            <span className="hidden sm:inline">
+              {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
+            </span>
+            <span className="sm:hidden">
+              {new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
+            </span>
           </Badge>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 grid-cols-2 md:gap-4 lg:grid-cols-4">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
             <Card key={index} className="overflow-hidden hover:shadow-lg transition-all">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 p-3 md:p-6">
+                <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground">
                   {stat.title}
                 </CardTitle>
-                <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                  <Icon className={`h-4 w-4 ${stat.color}`} />
+                <div className={`p-1.5 md:p-2 rounded-lg ${stat.bgColor}`}>
+                  <Icon className={`h-3 w-3 md:h-4 md:w-4 ${stat.color}`} />
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">
+              <CardContent className="p-3 pt-0 md:p-6 md:pt-0">
+                <div className="text-2xl md:text-3xl font-bold">
                   <AnimatedCounter value={stat.value} duration={1500} />
                 </div>
-                <div className="flex items-center gap-1 mt-2">
+                <div className="flex items-center gap-1 mt-1 md:mt-2">
                   {stat.changeType === 'positive' ? (
-                    <ArrowUpRight className="h-4 w-4 text-green-500" />
+                    <ArrowUpRight className="h-3 w-3 md:h-4 md:w-4 text-green-500" />
                   ) : (
-                    <ArrowDownRight className="h-4 w-4 text-red-500" />
+                    <ArrowDownRight className="h-3 w-3 md:h-4 md:w-4 text-red-500" />
                   )}
-                  <span className={`text-sm font-medium ${
+                  <span className={`text-xs md:text-sm font-medium ${
                     stat.changeType === 'positive' ? 'text-green-600' : 'text-red-600'
                   }`}>
                     {stat.change}
                   </span>
-                  <span className="text-xs text-muted-foreground">{stat.changeText}</span>
+                  <span className="text-[10px] md:text-xs text-muted-foreground hidden sm:inline">{stat.changeText}</span>
                 </div>
               </CardContent>
             </Card>
@@ -194,22 +199,22 @@ export default function DashboardPage() {
       </div>
 
       {/* Gráficos */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:gap-6 md:grid-cols-2 lg:grid-cols-3">
         {/* Actividad Semanal */}
         <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
+          <CardHeader className="p-4 md:p-6">
+            <CardTitle className="flex items-center gap-2 text-base md:text-lg">
+              <TrendingUp className="h-4 w-4 md:h-5 md:w-5" />
               Actividad Semanal
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-xs md:text-sm">
               Tareas y actividades completadas esta semana
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
             <BarChart 
               data={chartWeeklyData} 
-              height={180} 
+              height={150} 
               barColor="bg-gradient-to-t from-blue-600 to-indigo-500"
             />
           </CardContent>
@@ -217,22 +222,22 @@ export default function DashboardPage() {
 
         {/* Distribución de Tareas */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5" />
+          <CardHeader className="p-4 md:p-6">
+            <CardTitle className="flex items-center gap-2 text-base md:text-lg">
+              <CheckCircle2 className="h-4 w-4 md:h-5 md:w-5" />
               Estado de Tareas
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-xs md:text-sm">
               Distribución actual
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col items-center">
-            <DonutChart data={chartTaskData} size={140} strokeWidth={18} />
-            <div className="flex flex-wrap justify-center gap-4 mt-4">
+          <CardContent className="flex flex-col items-center p-4 pt-0 md:p-6 md:pt-0">
+            <DonutChart data={chartTaskData} size={120} strokeWidth={16} />
+            <div className="flex flex-wrap justify-center gap-2 md:gap-4 mt-3 md:mt-4">
               {chartTaskData.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                  <span className="text-xs text-muted-foreground">{item.label}: {item.value}</span>
+                <div key={idx} className="flex items-center gap-1 md:gap-2">
+                  <div className="w-2 h-2 md:w-3 md:h-3 rounded-full" style={{ backgroundColor: item.color }} />
+                  <span className="text-[10px] md:text-xs text-muted-foreground">{item.label}: {item.value}</span>
                 </div>
               ))}
             </div>
@@ -241,56 +246,56 @@ export default function DashboardPage() {
       </div>
 
       {/* Segunda fila */}
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-4 md:gap-6 md:grid-cols-2">
         {/* Progreso Mensual */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <GraduationCap className="h-5 w-5" />
+          <CardHeader className="p-4 md:p-6">
+            <CardTitle className="flex items-center gap-2 text-base md:text-lg">
+              <GraduationCap className="h-4 w-4 md:h-5 md:w-5" />
               Progreso Mensual
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-xs md:text-sm">
               Rendimiento académico de los últimos 6 meses
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <LineChart data={chartMonthlyData} height={150} lineColor="#8b5cf6" />
+          <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
+            <LineChart data={chartMonthlyData} height={130} lineColor="#8b5cf6" />
           </CardContent>
         </Card>
 
         {/* Quick Stats */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
+          <CardHeader className="p-4 md:p-6">
+            <CardTitle className="flex items-center gap-2 text-base md:text-lg">
+              <Users className="h-4 w-4 md:h-5 md:w-5" />
               Resumen Rápido
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-4 rounded-lg bg-blue-50 dark:bg-blue-950">
-                <div className="text-3xl font-bold text-blue-600">
+          <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
+            <div className="grid grid-cols-2 gap-2 md:gap-4">
+              <div className="text-center p-3 md:p-4 rounded-lg bg-blue-50 dark:bg-blue-950">
+                <div className="text-2xl md:text-3xl font-bold text-blue-600">
                   <AnimatedCounter value={courses.length} />
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">Cursos Inscritos</p>
+                <p className="text-[10px] md:text-xs text-muted-foreground mt-1">Cursos Inscritos</p>
               </div>
-              <div className="text-center p-4 rounded-lg bg-green-50 dark:bg-green-950">
-                <div className="text-3xl font-bold text-green-600">
+              <div className="text-center p-3 md:p-4 rounded-lg bg-green-50 dark:bg-green-950">
+                <div className="text-2xl md:text-3xl font-bold text-green-600">
                   <AnimatedCounter value={dashboardStats?.completionRate || 0} suffix="%" />
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">Tasa Completado</p>
+                <p className="text-[10px] md:text-xs text-muted-foreground mt-1">Tasa Completado</p>
               </div>
-              <div className="text-center p-4 rounded-lg bg-purple-50 dark:bg-purple-950">
-                <div className="text-3xl font-bold text-purple-600">
+              <div className="text-center p-3 md:p-4 rounded-lg bg-purple-50 dark:bg-purple-950">
+                <div className="text-2xl md:text-3xl font-bold text-purple-600">
                   <AnimatedCounter value={dashboardStats?.newMessages || 0} />
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">Mensajes</p>
+                <p className="text-[10px] md:text-xs text-muted-foreground mt-1">Mensajes</p>
               </div>
-              <div className="text-center p-4 rounded-lg bg-orange-50 dark:bg-orange-950">
-                <div className="text-3xl font-bold text-orange-600">
+              <div className="text-center p-3 md:p-4 rounded-lg bg-orange-50 dark:bg-orange-950">
+                <div className="text-2xl md:text-3xl font-bold text-orange-600">
                   <AnimatedCounter value={dashboardStats?.tasksPending || 0} />
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">Pendientes</p>
+                <p className="text-[10px] md:text-xs text-muted-foreground mt-1">Pendientes</p>
               </div>
             </div>
           </CardContent>
@@ -299,25 +304,25 @@ export default function DashboardPage() {
 
       {/* Mis Cursos */}
       <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold tracking-tight">Mis Cursos</h2>
-          <Link href="/courses" className="text-sm text-primary hover:underline flex items-center gap-1">
+        <div className="flex items-center justify-between mb-3 md:mb-4">
+          <h2 className="text-xl md:text-2xl font-bold tracking-tight">Mis Cursos</h2>
+          <Link href="/courses" className="text-xs md:text-sm text-primary hover:underline flex items-center gap-1">
             Ver todos
-            <ArrowUpRight className="h-4 w-4" />
+            <ArrowUpRight className="h-3 w-3 md:h-4 md:w-4" />
           </Link>
         </div>
         {courses.length === 0 ? (
           <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <BookOpen className="h-12 w-12 text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">No hay cursos disponibles</p>
-              <p className="text-sm text-muted-foreground mt-1">
+            <CardContent className="flex flex-col items-center justify-center py-8 md:py-12">
+              <BookOpen className="h-10 w-10 md:h-12 md:w-12 text-muted-foreground mb-3 md:mb-4" />
+              <p className="text-sm md:text-base text-muted-foreground">No hay cursos disponibles</p>
+              <p className="text-xs md:text-sm text-muted-foreground mt-1">
                 Los cursos aparecerán aquí cuando estén disponibles
               </p>
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {courses.map((curso) => (
               <CardCurso key={curso.id} curso={curso} />
             ))}

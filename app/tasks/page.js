@@ -137,55 +137,55 @@ export default function TasksPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Mis Tareas</h1>
-        <p className="text-muted-foreground mt-2">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Mis Tareas</h1>
+        <p className="text-sm md:text-base text-muted-foreground mt-1 md:mt-2">
           Gestiona y revisa todas tus tareas pendientes
         </p>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
         <Card>
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800">
-              <ClipboardList className="h-5 w-5 text-slate-600" />
+          <CardContent className="p-3 md:p-4 flex items-center gap-2 md:gap-3">
+            <div className="p-1.5 md:p-2 rounded-lg bg-slate-100 dark:bg-slate-800">
+              <ClipboardList className="h-4 w-4 md:h-5 md:w-5 text-slate-600" />
             </div>
             <div>
-              <div className="text-2xl font-bold">{stats.total}</div>
-              <div className="text-xs text-muted-foreground">Total</div>
+              <div className="text-xl md:text-2xl font-bold">{stats.total}</div>
+              <div className="text-[10px] md:text-xs text-muted-foreground">Total</div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-950">
-              <Clock className="h-5 w-5 text-orange-600" />
+          <CardContent className="p-3 md:p-4 flex items-center gap-2 md:gap-3">
+            <div className="p-1.5 md:p-2 rounded-lg bg-orange-100 dark:bg-orange-950">
+              <Clock className="h-4 w-4 md:h-5 md:w-5 text-orange-600" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-orange-600">{stats.pendientes}</div>
-              <div className="text-xs text-muted-foreground">Pendientes</div>
+              <div className="text-xl md:text-2xl font-bold text-orange-600">{stats.pendientes}</div>
+              <div className="text-[10px] md:text-xs text-muted-foreground">Pendientes</div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-green-100 dark:bg-green-950">
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
+          <CardContent className="p-3 md:p-4 flex items-center gap-2 md:gap-3">
+            <div className="p-1.5 md:p-2 rounded-lg bg-green-100 dark:bg-green-950">
+              <CheckCircle2 className="h-4 w-4 md:h-5 md:w-5 text-green-600" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-green-600">{stats.completadas}</div>
-              <div className="text-xs text-muted-foreground">Completadas</div>
+              <div className="text-xl md:text-2xl font-bold text-green-600">{stats.completadas}</div>
+              <div className="text-[10px] md:text-xs text-muted-foreground">Completadas</div>
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-red-100 dark:bg-red-950">
-              <AlertCircle className="h-5 w-5 text-red-600" />
+          <CardContent className="p-3 md:p-4 flex items-center gap-2 md:gap-3">
+            <div className="p-1.5 md:p-2 rounded-lg bg-red-100 dark:bg-red-950">
+              <AlertCircle className="h-4 w-4 md:h-5 md:w-5 text-red-600" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-red-600">{stats.urgentes}</div>
-              <div className="text-xs text-muted-foreground">Urgentes</div>
+              <div className="text-xl md:text-2xl font-bold text-red-600">{stats.urgentes}</div>
+              <div className="text-[10px] md:text-xs text-muted-foreground">Urgentes</div>
             </div>
           </CardContent>
         </Card>
@@ -198,21 +198,21 @@ export default function TasksPage() {
       )}
 
       {/* Filtros */}
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col sm:flex-row gap-2 md:gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Buscar tareas..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 h-9 md:h-10 text-sm"
           />
         </div>
         <div className="flex gap-2 flex-wrap">
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-3 py-2 border rounded-lg bg-white dark:bg-gray-800 text-sm"
+            className="px-2 md:px-3 py-1.5 md:py-2 border rounded-lg bg-white dark:bg-gray-800 text-xs md:text-sm flex-1 sm:flex-none"
           >
             <option value="">Todos los estados</option>
             <option value="pendiente">Pendientes</option>
@@ -222,7 +222,7 @@ export default function TasksPage() {
           <select
             value={filterCourse}
             onChange={(e) => setFilterCourse(e.target.value)}
-            className="px-3 py-2 border rounded-lg bg-white dark:bg-gray-800 text-sm"
+            className="px-2 md:px-3 py-1.5 md:py-2 border rounded-lg bg-white dark:bg-gray-800 text-xs md:text-sm flex-1 sm:flex-none"
           >
             <option value="">Todos los cursos</option>
             {courses.map(c => (
@@ -232,7 +232,7 @@ export default function TasksPage() {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="px-3 py-2 border rounded-lg bg-white dark:bg-gray-800 text-sm"
+            className="px-2 md:px-3 py-1.5 md:py-2 border rounded-lg bg-white dark:bg-gray-800 text-xs md:text-sm flex-1 sm:flex-none"
           >
             <option value="fecha">Ordenar por fecha</option>
             <option value="titulo">Ordenar por título</option>
@@ -269,45 +269,51 @@ export default function TasksPage() {
                   urgent ? 'border-orange-300 dark:border-orange-700 border-2' : ''
                 }`}
               >
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="space-y-1 flex-1">
-                      <div className="flex items-center gap-2">
-                        <CardTitle className="text-xl">{task.titulo}</CardTitle>
+                <CardHeader className="pb-2 md:pb-3 p-3 md:p-6">
+                  <div className="flex flex-col sm:flex-row items-start justify-between gap-2 md:gap-4">
+                    <div className="space-y-1 flex-1 w-full">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <CardTitle className="text-base md:text-xl">{task.titulo}</CardTitle>
                         {urgent && (
-                          <Badge variant="outline" className="text-orange-600 border-orange-300 animate-pulse">
+                          <Badge variant="outline" className="text-orange-600 border-orange-300 animate-pulse text-[10px] md:text-xs">
                             ⚡ Urgente
                           </Badge>
                         )}
                       </div>
-                      <CardDescription className="flex items-center gap-2">
-                        <BookOpen className="h-4 w-4" />
+                      <CardDescription className="flex items-center gap-2 text-xs md:text-sm">
+                        <BookOpen className="h-3 w-3 md:h-4 md:w-4" />
                         {task.courseName || 'Curso'}
                       </CardDescription>
                     </div>
-                    <Badge className={`${statusConfig.color} gap-1`}>
-                      <StatusIcon className="h-3 w-3" />
+                    <Badge className={`${statusConfig.color} gap-1 text-[10px] md:text-xs whitespace-nowrap`}>
+                      <StatusIcon className="h-2.5 w-2.5 md:h-3 md:w-3" />
                       {statusConfig.label}
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-muted-foreground">{task.descripcion}</p>
-                  <div className="flex items-center justify-between">
-                    <div className={`flex items-center gap-2 ${urgent ? 'text-orange-600 font-medium' : 'text-muted-foreground'}`}>
-                      <Calendar className="h-4 w-4" />
-                      <span>
+                <CardContent className="space-y-3 md:space-y-4 p-3 pt-0 md:p-6 md:pt-0">
+                  <p className="text-sm md:text-base text-muted-foreground">{task.descripcion}</p>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 md:gap-4">
+                    <div className={`flex items-center gap-1 md:gap-2 text-xs md:text-sm ${urgent ? 'text-orange-600 font-medium' : 'text-muted-foreground'}`}>
+                      <Calendar className="h-3 w-3 md:h-4 md:w-4" />
+                      <span className="hidden md:inline">
                         Entrega: {new Date(task.fecha_entrega).toLocaleDateString('es-ES', {
                           year: 'numeric',
                           month: 'long',
                           day: 'numeric'
                         })}
                       </span>
-                      <Badge variant="outline" className={urgent ? 'text-orange-600 border-orange-300' : ''}>
+                      <span className="md:hidden">
+                        {new Date(task.fecha_entrega).toLocaleDateString('es-ES', {
+                          day: 'numeric',
+                          month: 'short'
+                        })}
+                      </span>
+                      <Badge variant="outline" className={`${urgent ? 'text-orange-600 border-orange-300' : ''} text-[10px] md:text-xs`}>
                         {getDaysRemaining(task.fecha_entrega)}
                       </Badge>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="text-xs md:text-sm h-8 md:h-9 w-full sm:w-auto">
                       Ver detalles
                     </Button>
                   </div>
