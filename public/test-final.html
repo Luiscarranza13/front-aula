@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Final - Conexión Backend</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            padding: 20px; 
+            max-width: 900px; 
+            margin: 0 auto; 
+            background: #f8fafc;
+        }
+        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .status { padding: 12px 16px; margin: 12px 0; border-radius: 8px; font-weight: 500; }
+        .success { background: #dcfce7; color: #166534; border-left: 4px solid #22c55e; }
+        .error { background: #fef2f2; color: #dc2626; border-left: 4px solid #ef4444; }
+        .info { background: #eff6ff; color: #1d4ed8; border-left: 4px solid #3b82f6; }
+        .warning { background: #fefce8; color: #ca8a04; border-left: 4px solid #eab308; }
+        button { 
+            padding: 12px 24px; 
+            margin: 8px; 
+            cursor: pointer; 
+            background: #1e293b; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        button:hover { background: #334155; transform: translateY(-1px); }
+        button:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 20px 0; }
+        .card { background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .card h3 { margin: 0 0 8px 0; color: #1e293b; font-size: 14px; font-weight: 600; }
+        .card p { margin: 0; color: #64748b; font-size: 13px; }
+        pre { 
+            background: #1e293b; 
+            color: #e2e8f0; 
+            padding: 16px; 
+            border-radius: 8px; 
+            overflow-x: auto; 
+            font-size: 12px; 
+            line-height: 1.5;
+        }
+        .loading { display: inline-block; width: 16px; height: 16px; border: 2px solid #e2e8f0; border-top: 2px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: #1e293b; margin: 0 0 8px 0; }
+        .header p { color: #64748b; margin: 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Test Final - Conexión Backend</h1>
+            <p>Verificación completa de conectividad con Railway</p>
+        </div>
+        
+        <div id="results"></div>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <button onclick="runCompleteTest()" id="testBtn">🚀 Ejecutar Test Completo</button>
+            <button onclick="testLogin()" id="loginBtn">🔐 Test Login Admin</button>
+            <button onclick="clearResults()">🗑️ Limpiar</button>
+        </div>
+        
+        <div class="grid">
+            <div class="card">
+                <h3>Backend URL</h3>
+                <p id="backendUrl">https://backend-aula-production.up.railway.app</p>
+            </div>
+            <div class="card">
+                <h3>Estado</h3>
+                <p id="connectionStatus">No probado</p>
+            </div>
+            <div class="card">
+                <h3>Latencia</h3>
+                <p id="latency">-</p>
+            </div>
+            <div class="card">
+                <h3>Cursos</h3>
+                <p id="coursesCount">-</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const BACKEND_URL = 'https://backend-aula-production.up.railway.app';
+        
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong> ${message}`;
+            document.getElementById('results').appendChild(div);
+            div.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function updateCard(id, value) {
+            const element = document.getElementById(id);
+            if (element) element.textContent = value;
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+            updateCard('connectionStatus', 'No probado');
+            updateCard('latency', '-');
+            updateCard('coursesCount', '-');
+        }
+        
+        async function testHealth() {
+            log('🏥 Probando health check...', 'info');
+            
+            try {
+                const start = Date.now();
+                const response = await fetch(`${BACKEND_URL}/health`);
+                const latency = Date.now() - start;
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Health check OK (${latency}ms)`, 'success');
+                    updateCard('connectionStatus', '✅ Conectado');
+                    updateCard('latency', `${latency}ms`);
+                    return { success: true, latency, data };
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                log(`❌ Health check falló: ${error.message}`, 'error');
+                updateCard('connectionStatus', '❌ Error');
+                return { success: false, error: error.message };
+            }
+        }
+        
+        async function testCourses() {
+            log('📚 Probando endpoint de cursos...', 'info');
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/courses`);
+                
+                if (response.ok) {
+                    const courses = await response.json();
+                    log(`✅ Cursos cargados: ${courses.length} encontrados`, 'success');
+                    updateCard('coursesCount', `${courses.length} cursos`);
+                    
+                    if (courses.length > 0) {
+                        const sample = courses.slice(0, 2).map(c => `• ${c.titulo} (${c.grado})`).join('<br>');
+                        log(`📋 Muestra de cursos:<br>${sample}`, 'info');
+                    }
+                    
+                    return { success: true, courses };
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                log(`❌ Error cargando cursos: ${error.message}`, 'error');
+                updateCard('coursesCount', '❌ Error');
+                return { success: false, error: error.message };
+            }
+        }
+        
+        async function testCORS() {
+            log('🌐 Probando configuración CORS...', 'info');
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/courses`, {
+                    method: 'OPTIONS'
+                });
+                
+                const corsOrigin = response.headers.get('Access-Control-Allow-Origin');
+                const corsMethods = response.headers.get('Access-Control-Allow-Methods');
+                
+                if (corsOrigin) {
+                    log(`✅ CORS configurado correctamente`, 'success');
+                    log(`📋 Origin: ${corsOrigin}, Methods: ${corsMethods}`, 'info');
+                    return { success: true, corsOrigin, corsMethods };
+                } else {
+                    log(`⚠️ CORS podría tener problemas`, 'warning');
+                    return { success: false, message: 'No CORS headers found' };
+                }
+            } catch (error) {
+                log(`❌ Error probando CORS: ${error.message}`, 'error');
+                return { success: false, error: error.message };
+            }
+        }
+        
+        async function testLogin() {
+            log('🔐 Probando login de administrador...', 'info');
+            
+            const btn = document.getElementById('loginBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Probando login...';
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@aula.com',
+                        password: 'admin123'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Login exitoso como: ${data.user.email} (${data.user.rol})`, 'success');
+                    log(`🎫 Token recibido: ${data.access_token.substring(0, 20)}...`, 'info');
+                    return { success: true, data };
+                } else {
+                    const errorData = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorData}`);
+                }
+            } catch (error) {
+                log(`❌ Login falló: ${error.message}`, 'error');
+                return { success: false, error: error.message };
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🔐 Test Login Admin';
+            }
+        }
+        
+        async function runCompleteTest() {
+            log('🚀 === INICIANDO TEST COMPLETO ===', 'info');
+            
+            const btn = document.getElementById('testBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Ejecutando tests...';
+            
+            const results = {
+                timestamp: new Date().toISOString(),
+                tests: []
+            };
+            
+            // Test 1: Health Check
+            const healthResult = await testHealth();
+            results.tests.push({ name: 'Health Check', ...healthResult });
+            
+            // Test 2: Courses
+            const coursesResult = await testCourses();
+            results.tests.push({ name: 'Courses API', ...coursesResult });
+            
+            // Test 3: CORS
+            const corsResult = await testCORS();
+            results.tests.push({ name: 'CORS Config', ...corsResult });
+            
+            // Test 4: Login
+            const loginResult = await testLogin();
+            results.tests.push({ name: 'Authentication', ...loginResult });
+            
+            // Resumen
+            const passed = results.tests.filter(t => t.success).length;
+            const total = results.tests.length;
+            
+            log('📊 === RESUMEN FINAL ===', 'info');
+            log(`Tests pasados: ${passed}/${total}`, passed === total ? 'success' : 'warning');
+            
+            if (passed === total) {
+                log('🎉 TODOS LOS TESTS PASARON - EL SISTEMA ESTÁ FUNCIONANDO CORRECTAMENTE', 'success');
+                log('💡 Si el frontend no funciona en Netlify, revisar variables de entorno', 'info');
+            } else {
+                log('⚠️ ALGUNOS TESTS FALLARON - REVISAR CONFIGURACIÓN', 'warning');
+            }
+            
+            // Mostrar JSON completo
+            log(`📋 Resultados completos:<br><pre>${JSON.stringify(results, null, 2)}</pre>`, 'info');
+            
+            btn.disabled = false;
+            btn.innerHTML = '🚀 Ejecutar Test Completo';
+        }
+        
+        // Auto-ejecutar al cargar
+        window.onload = () => {
+            log('🌐 Página cargada. Backend configurado en: ' + BACKEND_URL, 'info');
+            setTimeout(runCompleteTest, 1000);
+        };
+    </script>
+</body>
+</html>

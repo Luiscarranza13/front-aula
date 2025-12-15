@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getCourses, getDashboardStats } from '@/lib/api-new';
+import { getCourses, getDashboardStats } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import CardCurso from '@/components/CardCurso';
 import { DashboardSkeleton } from '@/components/Skeleton';

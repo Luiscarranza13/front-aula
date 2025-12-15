@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getCourses, diagnosticBackend, checkConnectivity } from '@/lib/api-final';
+import { getCourses, runDiagnostic, checkHealth } from '@/lib/api';
 import CardCurso from '@/components/CardCurso';
 import { DashboardSkeleton } from '@/components/Skeleton';
 import { Card, CardContent } from '@/components/ui/card';
@@ -37,7 +37,7 @@ export default function CoursesPage() {
     
     try {
       // Verificar conectividad primero
-      const connStatus = await checkConnectivity();
+      const connStatus = await checkHealth();
       setConnectivity(connStatus);
       
       // Cargar cursos
@@ -60,10 +60,10 @@ export default function CoursesPage() {
   };
 
   // Función para ejecutar diagnóstico
-  const runDiagnostic = async () => {
+  const runDiagnosticTest = async () => {
     setShowDiagnostic(true);
     try {
-      const result = await diagnosticBackend();
+      const result = await runDiagnostic();
       setDiagnostic(result);
     } catch (error) {
       setDiagnostic({
@@ -153,7 +153,7 @@ export default function CoursesPage() {
           </Button>
           
           <Button 
-            onClick={runDiagnostic}
+            onClick={runDiagnosticTest}
             variant="outline"
             size="sm"
             className="gap-2"
@@ -263,7 +263,7 @@ export default function CoursesPage() {
                   Reintentar
                 </Button>
                 <Button 
-                  onClick={runDiagnostic}
+                  onClick={runDiagnosticTest}
                   size="sm"
                   variant="outline"
                   className="text-red-600 border-red-300 hover:bg-red-50"

@@ -18,7 +18,13 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# Headers de seguridad
+# Redirects para SPA
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers de seguridad y CORS
 [[headers]]
   for = "/*"
   [headers.values]
@@ -27,3 +33,13 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization, Accept"
+
+# Headers específicos para API calls
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization, Accept"

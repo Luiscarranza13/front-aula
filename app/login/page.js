@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { login as apiLogin } from '@/lib/api-new';
+import { login as apiLogin } from '@/lib/api';
 import { Eye, EyeOff, Mail, Lock, Loader2, CheckCircle2, XCircle, AlertCircle, Home, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
