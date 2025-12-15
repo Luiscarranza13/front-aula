@@ -14,11 +14,27 @@ const nextConfig = {
     ],
   },
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'https://backend-aula-production.up.railway.app',
+    NEXT_PUBLIC_API_URL: 'https://backend-aula-production.up.railway.app',
+  },
+  publicRuntimeConfig: {
+    NEXT_PUBLIC_API_URL: 'https://backend-aula-production.up.railway.app',
   },
   reactStrictMode: true,
   typescript: {
     ignoreBuildErrors: true,
+  },
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Backend-URL',
+            value: 'https://backend-aula-production.up.railway.app',
+          },
+        ],
+      },
+    ];
   },
 };
 

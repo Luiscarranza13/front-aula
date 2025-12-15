@@ -6,6 +6,15 @@
   NODE_VERSION = "20"
   NEXT_PUBLIC_API_URL = "https://backend-aula-production.up.railway.app"
 
+[context.production.environment]
+  NEXT_PUBLIC_API_URL = "https://backend-aula-production.up.railway.app"
+
+[context.deploy-preview.environment]
+  NEXT_PUBLIC_API_URL = "https://backend-aula-production.up.railway.app"
+
+[context.branch-deploy.environment]
+  NEXT_PUBLIC_API_URL = "https://backend-aula-production.up.railway.app"
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
