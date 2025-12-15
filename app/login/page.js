@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { login as apiLogin } from '@/lib/api';
+import { login as apiLogin } from '@/lib/api-new';
 import { Eye, EyeOff, Mail, Lock, Loader2, CheckCircle2, XCircle, AlertCircle, Home, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
@@ -269,7 +269,7 @@ export default function LoginPage() {
             <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
               <p className="text-xs font-medium text-slate-700 dark:text-slate-300 mb-2">Credenciales de prueba:</p>
               <div className="space-y-1 text-xs text-slate-600 dark:text-slate-400">
-                <p>Admin: admin@test.com / admin123</p>
+                <p>Admin: admin@aula.com / admin123</p>
                 <p>Docente: docente@test.com / admin123</p>
                 <p>Estudiante: estudiante@test.com / admin123</p>
               </div>
