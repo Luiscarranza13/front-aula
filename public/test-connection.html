@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Conexión Backend</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Test de Conexión Backend</h1>
+    <div id="results"></div>
+    
+    <button onclick="testConnection()">Probar Conexión</button>
+    <button onclick="testLogin()">Probar Login</button>
+    
+    <script>
+        const BACKEND_URL = 'https://backend-aula-production.up.railway.app';
+        
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${message}`;
+            document.getElementById('results').appendChild(div);
+        }
+        
+        async function testConnection() {
+            log('Probando conexión con: ' + BACKEND_URL);
+            
+            try {
+                const response = await fetch(BACKEND_URL + '/health');
+                if (response.ok) {
+                    const data = await response.json();
+                    log('✅ Conexión exitosa: ' + JSON.stringify(data), 'success');
+                } else {
+                    log('❌ Error HTTP: ' + response.status + ' - ' + response.statusText, 'error');
+                }
+            } catch (error) {
+                log('❌ Error de conexión: ' + error.message, 'error');
+            }
+        }
+        
+        async function testLogin() {
+            log('Probando login con admin@aula.com');
+            
+            try {
+                const response = await fetch(BACKEND_URL + '/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email: 'admin@aula.com', 
+                        password: 'admin123' 
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('✅ Login exitoso: Usuario ' + data.user.email + ' (Rol: ' + data.user.role + ')', 'success');
+                } else {
+                    const error = await response.text();
+                    log('❌ Error en login: ' + response.status + ' - ' + error, 'error');
+                }
+            } catch (error) {
+                log('❌ Error de conexión en login: ' + error.message, 'error');
+            }
+        }
+        
+        // Test automático al cargar
+        window.onload = () => {
+            log('Página cargada. URL del backend: ' + BACKEND_URL);
+            testConnection();
+        };
+    </script>
+</body>
+</html>

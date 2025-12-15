@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { getExams, getCourses, getStudentExamAttempts } from '@/lib/api';
+import { getExams, getCourses } from '@/lib/api-new';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -28,16 +28,11 @@ export default function ExamsPage() {
   const fetchData = async () => {
     try {
       const [examsData, coursesData] = await Promise.all([
-        getExams(),
-        getCourses(),
+        getExams().catch(() => []),
+        getCourses().catch(() => []),
       ]);
       setExams(examsData);
       setCourses(coursesData);
-      
-      if (isEstudiante()) {
-        const attemptsData = await getStudentExamAttempts(user.id);
-        setAttempts(attemptsData);
-      }
     } catch (error) {
       console.error('Error:', error);
     } finally {

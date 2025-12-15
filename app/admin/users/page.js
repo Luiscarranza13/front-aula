@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { getUsers, createUser, updateUser, deleteUser, uploadFile, getUploadUrl } from '@/lib/api';
+import { getUsers } from '@/lib/api-new';
 import { DashboardSkeleton } from '@/components/Skeleton';
 import Modal, { ModalFooter, ConfirmModal } from '@/components/Modal';
 import { Button } from '@/components/ui/button';

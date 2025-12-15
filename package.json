@@ -7,10 +7,11 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "rm -rf .next && next build",
+    "build": "node scripts/verify-build.js && rm -rf .next && next build",
     "start": "next start",
     "lint": "eslint",
-    "clean": "rm -rf .next"
+    "clean": "rm -rf .next",
+    "verify": "node scripts/verify-build.js"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",

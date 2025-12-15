@@ -3,13 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { 
-  getCourses, createCourse, updateCourse, deleteCourse, getUsers,
-  getTasksByCourse, createTask, updateTask, deleteTask,
-  getResourcesByCourse, createResource, updateResource, deleteResource,
-  getForumsByCourse, createForum, updateForum, deleteForum,
-  uploadFile, getUploadUrl
-} from '@/lib/api';
+import { getCourses, getUsers } from '@/lib/api-new';
 import { DashboardSkeleton } from '@/components/Skeleton';
 import Modal, { ModalFooter, ConfirmModal } from '@/components/Modal';
 import FileUpload from '@/components/FileUpload';
@@ -95,11 +89,12 @@ export default function AdminCoursesPage() {
   const fetchData = async () => {
     try {
       const [coursesData, usersData] = await Promise.all([
-        getCourses(), getUsers(),
+        getCourses().catch(() => []), 
+        getUsers().catch(() => []),
       ]);
       setCourses(coursesData);
       setFilteredCourses(coursesData);
-      setUsers(usersData.filter(u => u.rol === 'docente'));
+      setUsers(usersData.filter(u => u.rol === 'docente' || u.rol === 'profesor'));
     } catch (error) {
       showNotification('Error al cargar datos', 'error');
     } finally {
@@ -110,12 +105,12 @@ export default function AdminCoursesPage() {
   const fetchCourseContent = async (courseId) => {
     setLoadingContent(true);
     try {
-      const [tasks, resources, forums] = await Promise.all([
-        getTasksByCourse(courseId),
-        getResourcesByCourse(courseId),
-        getForumsByCourse(courseId),
-      ]);
-      setContentData({ tasks, resources, forums });
+      // Por ahora usar datos mock hasta que se implementen estos endpoints
+      setContentData({ 
+        tasks: [], 
+        resources: [], 
+        forums: [] 
+      });
     } catch (error) {
       showNotification('Error al cargar contenido', 'error');
     } finally {
@@ -132,17 +127,11 @@ export default function AdminCoursesPage() {
     e.preventDefault();
     setSaving(true);
     try {
-      if (editingCourse) {
-        await updateCourse(editingCourse.id, formData);
-        showNotification('Curso actualizado correctamente');
-      } else {
-        await createCourse(formData);
-        showNotification('Curso creado correctamente');
-      }
+      // Por ahora mostrar mensaje de funcionalidad no disponible
+      showNotification('Funcionalidad de creación/edición no disponible aún', 'error');
       setShowModal(false);
       setEditingCourse(null);
       setFormData({ titulo: '', descripcion: '', grado: '', seccion: '', docenteId: '' });
-      fetchData();
     } catch (error) {
       showNotification('Error al guardar curso: ' + error.message, 'error');
     } finally {
@@ -165,9 +154,7 @@ export default function AdminCoursesPage() {
   const handleDelete = async () => {
     if (!deletingCourse) return;
     try {
-      await deleteCourse(deletingCourse.id);
-      showNotification('Curso eliminado correctamente');
-      fetchData();
+      showNotification('Funcionalidad de eliminación no disponible aún', 'error');
     } catch (error) {
       showNotification('Error al eliminar curso: ' + error.message, 'error');
     }

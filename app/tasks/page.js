@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getCourses, getTasksByCourse } from '@/lib/api';
+import { getCourses, getTasks } from '@/lib/api-new';
 import { DashboardSkeleton } from '@/components/Skeleton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -26,25 +26,22 @@ export default function TasksPage() {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const coursesData = await getCourses();
+        const [coursesData, tasksData] = await Promise.all([
+          getCourses(),
+          getTasks().catch(() => [])
+        ]);
+        
         setCourses(coursesData);
-        const allTasks = [];
         
-        for (const course of coursesData) {
-          try {
-            const courseTasks = await getTasksByCourse(course.id);
-            allTasks.push(...courseTasks.map(task => ({
-              ...task,
-              courseName: course.titulo,
-              courseId: course.id
-            })));
-          } catch (e) {
-            console.log('No tasks for course', course.id);
-          }
-        }
+        // Mapear tareas con nombres de cursos
+        const tasksWithCourses = tasksData.map(task => ({
+          ...task,
+          courseName: coursesData.find(c => c.id === task.courseId)?.titulo || 'Curso',
+          courseId: task.courseId
+        }));
         
-        setTasks(allTasks);
-        setFilteredTasks(allTasks);
+        setTasks(tasksWithCourses);
+        setFilteredTasks(tasksWithCourses);
       } catch (err) {
         setError(err.message);
       } finally {

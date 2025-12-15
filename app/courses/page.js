@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getCourses } from '@/lib/api';
+import { getCourses } from '@/lib/api-new';
 import CardCurso from '@/components/CardCurso';
 import { DashboardSkeleton } from '@/components/Skeleton';
 import { Card, CardContent } from '@/components/ui/card';

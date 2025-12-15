@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getCourses, getDashboardStats, getWeeklyActivity, getTaskDistribution, getMonthlyProgress } from '@/lib/api';
+import { getCourses, getDashboardStats } from '@/lib/api-new';
 import { useAuth } from '@/context/AuthContext';
 import CardCurso from '@/components/CardCurso';
 import { DashboardSkeleton } from '@/components/Skeleton';
@@ -28,19 +28,13 @@ export default function DashboardPage() {
 
   const fetchData = async () => {
     try {
-      const [coursesData, statsData, weeklyData, taskData, monthlyData] = await Promise.all([
+      const [coursesData, statsData] = await Promise.all([
         getCourses(),
         getDashboardStats().catch(() => null),
-        getWeeklyActivity().catch(() => []),
-        getTaskDistribution().catch(() => []),
-        getMonthlyProgress().catch(() => []),
       ]);
       
       setCourses(coursesData.slice(0, 6));
       setDashboardStats(statsData);
-      setWeeklyActivity(weeklyData);
-      setTaskDistribution(taskData);
-      setMonthlyProgress(monthlyData);
     } catch (error) {
       console.error('Error al cargar datos:', error);
     } finally {
