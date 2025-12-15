@@ -20,11 +20,15 @@ export default function CoursesPage() {
 
   useEffect(() => {
     const fetchCourses = async () => {
+      console.log('🚀 Iniciando carga de cursos...');
       try {
         const data = await getCourses();
+        console.log('✅ Cursos recibidos en componente:', data);
         setCourses(data);
         setFilteredCourses(data);
+        setError(''); // Limpiar errores previos
       } catch (err) {
+        console.error('❌ Error en componente de cursos:', err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -64,11 +68,19 @@ export default function CoursesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Mis Cursos</h1>
-        <p className="text-sm md:text-base text-muted-foreground mt-1 md:mt-2">
-          Explora todos los cursos disponibles
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Mis Cursos</h1>
+          <p className="text-sm md:text-base text-muted-foreground mt-1 md:mt-2">
+            Explora todos los cursos disponibles
+          </p>
+        </div>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+        >
+          🔄 Recargar Cursos
+        </button>
       </div>
 
       {/* Stats */}
@@ -110,7 +122,21 @@ export default function CoursesPage() {
 
       {error && (
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg">
-          {error}
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">Error al cargar cursos:</p>
+              <p className="text-sm mt-1">{error}</p>
+              <p className="text-xs mt-2 opacity-75">
+                Backend: https://backend-aula-production.up.railway.app/courses
+              </p>
+            </div>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="ml-4 px-3 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700"
+            >
+              Reintentar
+            </button>
+          </div>
         </div>
       )}
 
