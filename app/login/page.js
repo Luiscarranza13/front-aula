@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { login as apiLogin } from '@/lib/api';
-import { Eye, EyeOff, Mail, Lock, Loader2, CheckCircle2, XCircle, AlertCircle, Home, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, Loader2, CheckCircle2, XCircle, AlertCircle, Home, ArrowLeft, BookOpen, ClipboardList, MessageSquare } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 export default function LoginPage() {
@@ -109,23 +110,29 @@ export default function LoginPage() {
         <div className="absolute bottom-20 right-20 w-96 h-96 bg-slate-800 rounded-full blur-3xl"></div>
         
         <div className={`max-w-md text-white relative z-10 transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <h1 className="text-4xl font-bold mb-6">Aula Virtual</h1>
+          <Image
+            src="/logo-novatec.jpeg"
+            alt="Novatec Academy"
+            width={220}
+            height={66}
+            className="h-14 w-auto object-contain mb-6 rounded-xl"
+          />
           <p className="text-lg text-slate-300 mb-8">
             Plataforma educativa moderna para gestionar cursos, tareas y recursos de forma eficiente.
           </p>
           <div className="space-y-4">
             {[
-              { icon: '📚', title: 'Gestión de Cursos', desc: 'Organiza y administra tus clases' },
-              { icon: '✅', title: 'Tareas y Evaluaciones', desc: 'Seguimiento del progreso estudiantil' },
-              { icon: '💬', title: 'Foros de Discusión', desc: 'Comunicación efectiva' },
+              { icon: BookOpen, title: 'Gestión de Cursos', desc: 'Organiza y administra tus clases' },
+              { icon: ClipboardList, title: 'Tareas y Evaluaciones', desc: 'Seguimiento del progreso estudiantil' },
+              { icon: MessageSquare, title: 'Foros de Discusión', desc: 'Comunicación efectiva' },
             ].map((item, idx) => (
-              <div 
-                key={idx} 
+              <div
+                key={idx}
                 className={`flex items-center gap-3 transition-all duration-500 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}
                 style={{ transitionDelay: `${(idx + 1) * 200}ms` }}
               >
-                <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center">
-                  <span className="text-2xl">{item.icon}</span>
+                <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <item.icon className="w-6 h-6 text-slate-300" />
                 </div>
                 <div>
                   <h3 className="font-semibold">{item.title}</h3>
@@ -148,11 +155,13 @@ export default function LoginPage() {
         <div className={`w-full max-w-md transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           {/* Logo móvil */}
           <div className="lg:hidden text-center mb-8">
-            <div className="w-14 h-14 bg-slate-900 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">📚</span>
-            </div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Aula Virtual</h1>
-            <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm">Plataforma Educativa</p>
+            <Image
+              src="/logo-novatec.jpeg"
+              alt="Novatec Academy"
+              width={180}
+              height={54}
+              className="h-12 w-auto object-contain mx-auto mb-4"
+            />
           </div>
 
           {/* Título */}
