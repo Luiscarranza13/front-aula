@@ -35,20 +35,27 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const loadUserProfile = async (session) => {
-    setToken(session.access_token);
+    try {
+      setToken(session.access_token);
 
-    // Cargar perfil extendido desde la tabla profiles
-    const { data: profile } = await supabase
-      .from('usuarios')
-      .select('*')
-      .eq('id', session.user.id)
-      .single();
+      const { data: profile } = await supabase
+        .from('usuarios')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
 
-    const fullUser = { ...session.user, ...profile };
-    setUser(fullUser);
+      const fullUser = { ...session.user, ...(profile || {}) };
+      setUser(fullUser);
 
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('user', JSON.stringify(fullUser));
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('user', JSON.stringify(fullUser));
+      }
+    } catch (e) {
+      // Si falla cargar el perfil, igual dejamos al usuario logueado con los datos básicos
+      setUser(session.user);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('user', JSON.stringify(session.user));
+      }
     }
   };
 
@@ -61,14 +68,19 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setToken(null);
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.error('Error al cerrar sesión:', e);
+    } finally {
+      setUser(null);
+      setToken(null);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+      }
+      router.push('/login');
     }
-    router.push('/login');
   };
 
   const updateUserData = async (newData) => {

@@ -43,6 +43,7 @@ export default function RegisterPage() {
       setTimeout(() => router.push('/login'), 2000);
     } catch (err) {
       setError(err.message || 'Error al crear cuenta');
+      setLoading(false);
     } finally {
       setLoading(false);
     }
