@@ -61,16 +61,8 @@ export default function SettingsPage() {
   const handleChangePassword = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) return showToast('Las contraseñas no coinciden', 'error');
     if (passwordData.newPassword.length < 6) return showToast('Mínimo 6 caracteres', 'error');
-    if (!passwordData.currentPassword) return showToast('Ingresa tu contraseña actual', 'error');
     setSavingPassword(true);
     try {
-      // Re-autenticar con contraseña actual
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: user.email,
-        password: passwordData.currentPassword
-      });
-      if (signInError) throw new Error('Contraseña actual incorrecta');
-      
       const { error } = await supabase.auth.updateUser({ password: passwordData.newPassword });
       if (error) throw error;
       setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
@@ -242,14 +234,6 @@ export default function SettingsPage() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid sm:grid-cols-2 gap-4">
-                      <div className="space-y-1.5 sm:col-span-2">
-                        <label className="text-sm font-medium">Contraseña actual</label>
-                        <div className="relative">
-                          <Input type="password" value={passwordData.currentPassword}
-                            onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                            placeholder="Tu contraseña actual" className="h-10 rounded-xl" />
-                        </div>
-                      </div>
                       <div className="space-y-1.5">
                         <label className="text-sm font-medium">Nueva contraseña</label>
                         <div className="relative">
