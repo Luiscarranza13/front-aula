@@ -38,6 +38,7 @@ export function DonutChart({ data, size = 150, strokeWidth = 20 }) {
   const circumference = 2 * Math.PI * radius;
   
   const segments = useMemo(() => {
+    if (!total) return [];
     let offset = 0;
     return data.map((item) => {
       const percent = item.value / total;
