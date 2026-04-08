@@ -161,7 +161,7 @@ export default function Navbar({ onMenuClick }) {
                   <User className="mr-2 h-4 w-4" />
                   Mi Perfil
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push('/admin/settings')}>
+                <DropdownMenuItem onClick={() => router.push(user?.rol === 'admin' || user?.rol === 'docente' ? '/admin/settings' : '/profile')}>
                   <Settings className="mr-2 h-4 w-4" />
                   Configuración
                 </DropdownMenuItem>
