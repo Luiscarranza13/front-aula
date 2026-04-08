@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { updateUser, uploadFile, getUploadUrl } from '@/lib/api';
+import { updateUser, uploadFile } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -71,7 +71,7 @@ export default function ProfilePage() {
     setUploadingAvatar(true);
     try {
       const result = await uploadFile(file);
-      const avatarUrl = getUploadUrl(result.file.filename);
+      const avatarUrl = result.url;
       setFormData(prev => ({ ...prev, avatar: avatarUrl }));
       showNotification('Foto actualizada correctamente');
     } catch (error) {
