@@ -3,27 +3,29 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { updateUser, uploadFile } from '@/lib/api';
+import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { 
-  User, Mail, Phone, Shield, Camera, Loader2, Save, 
-  Eye, EyeOff, CheckCircle2, AlertCircle, Lock, Edit3,
-  GraduationCap, BookOpen, Star, Calendar, Activity
+import {
+  User, Mail, Phone, Shield, Camera, Loader2, Save,
+  Eye, EyeOff, CheckCircle2, AlertCircle, Lock,
+  GraduationCap, BookOpen, Edit2, Sparkles, Calendar,
+  MapPin, Link2
 } from 'lucide-react';
 
 export default function ProfilePage() {
   const { user, updateUserData } = useAuth();
   const fileInputRef = useRef(null);
   const [saving, setSaving] = useState(false);
+  const [savingPassword, setSavingPassword] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const [notification, setNotification] = useState(null);
+  const [toast, setToast] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState(null);
-  const [activeSection, setActiveSection] = useState('info');
+  const [activeTab, setActiveTab] = useState('info');
+  const [editMode, setEditMode] = useState(false);
 
   const [formData, setFormData] = useState({ nombre: '', email: '', telefono: '', avatar: '' });
   const [passwordData, setPasswordData] = useState({ newPassword: '', confirmPassword: '' });
@@ -35,18 +37,18 @@ export default function ProfilePage() {
     }
   }, [user]);
 
-  const showNotification = (message, type = 'success') => {
-    setNotification({ message, type });
-    setTimeout(() => setNotification(null), 3000);
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
   };
 
   const getInitials = (name) => name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U';
 
   const roleConfig = {
-    admin: { gradient: 'from-red-500 to-orange-500', badge: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300', label: 'Administrador', icon: Shield },
-    docente: { gradient: 'from-blue-500 to-cyan-500', badge: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300', label: 'Docente', icon: BookOpen },
-    estudiante: { gradient: 'from-violet-500 to-purple-600', badge: 'bg-violet-100 text-violet-700 dark:bg-violet-900 dark:text-violet-300', label: 'Estudiante', icon: GraduationCap },
-  }[user?.rol] || { gradient: 'from-gray-500 to-gray-600', badge: 'bg-gray-100 text-gray-700', label: 'Usuario', icon: User };
+    admin: { gradient: 'from-rose-500 via-pink-500 to-orange-400', soft: 'bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300', label: 'Administrador', icon: Shield },
+    docente: { gradient: 'from-blue-600 via-indigo-500 to-violet-500', soft: 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300', label: 'Docente', icon: BookOpen },
+    estudiante: { gradient: 'from-violet-600 via-purple-500 to-fuchsia-500', soft: 'bg-violet-50 text-violet-700 dark:bg-violet-950 dark:text-violet-300', label: 'Estudiante', icon: GraduationCap },
+  }[user?.rol] || { gradient: 'from-gray-500 to-gray-600', soft: 'bg-gray-100 text-gray-700', label: 'Usuario', icon: User };
 
   const handleAvatarChange = async (e) => {
     const file = e.target.files?.[0];
@@ -58,9 +60,9 @@ export default function ProfilePage() {
     try {
       const result = await uploadFile(file);
       setFormData(prev => ({ ...prev, avatar: result.url }));
-      showNotification('Foto actualizada correctamente');
-    } catch (error) {
-      showNotification('Error al subir foto: ' + error.message, 'error');
+      showToast('Foto actualizada');
+    } catch (e) {
+      showToast(e.message, 'error');
     } finally {
       setUploadingAvatar(false);
     }
@@ -72,9 +74,10 @@ export default function ProfilePage() {
     try {
       await updateUser(user.id, { nombre: formData.nombre, telefono: formData.telefono, avatar: formData.avatar });
       if (updateUserData) updateUserData({ ...user, ...formData });
-      showNotification('Perfil actualizado correctamente');
-    } catch (error) {
-      showNotification('Error: ' + error.message, 'error');
+      setEditMode(false);
+      showToast('Perfil actualizado correctamente');
+    } catch (e) {
+      showToast(e.message, 'error');
     } finally {
       setSaving(false);
     }
@@ -82,18 +85,18 @@ export default function ProfilePage() {
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    if (passwordData.newPassword !== passwordData.confirmPassword) return showNotification('Las contraseñas no coinciden', 'error');
-    if (passwordData.newPassword.length < 6) return showNotification('Mínimo 6 caracteres', 'error');
-    setSaving(true);
+    if (passwordData.newPassword !== passwordData.confirmPassword) return showToast('Las contraseñas no coinciden', 'error');
+    if (passwordData.newPassword.length < 6) return showToast('Mínimo 6 caracteres', 'error');
+    setSavingPassword(true);
     try {
-      const { error } = await import('@/lib/supabase').then(m => m.supabase.auth.updateUser({ password: passwordData.newPassword }));
+      const { error } = await supabase.auth.updateUser({ password: passwordData.newPassword });
       if (error) throw error;
       setPasswordData({ newPassword: '', confirmPassword: '' });
-      showNotification('Contraseña actualizada correctamente');
-    } catch (error) {
-      showNotification('Error: ' + error.message, 'error');
+      showToast('Contraseña actualizada');
+    } catch (e) {
+      showToast(e.message, 'error');
     } finally {
-      setSaving(false);
+      setSavingPassword(false);
     }
   };
 
@@ -101,74 +104,115 @@ export default function ProfilePage() {
   const RoleIcon = roleConfig.icon;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 p-4 md:p-6">
-      {notification && (
-        <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-xl animate-in slide-in-from-top-2 ${
-          notification.type === 'error' ? 'bg-red-500 text-white' : 'bg-emerald-500 text-white'
+    <div className="min-h-screen bg-[#f5f5f7] dark:bg-gray-950">
+      {/* Toast */}
+      {toast && (
+        <div className={`fixed top-5 right-5 z-50 flex items-center gap-2.5 px-5 py-3 rounded-2xl shadow-2xl text-white text-sm font-medium animate-in slide-in-from-top-3 ${
+          toast.type === 'error' ? 'bg-red-500' : 'bg-emerald-500'
         }`}>
-          {notification.type === 'error' ? <AlertCircle className="h-5 w-5" /> : <CheckCircle2 className="h-5 w-5" />}
-          <span className="font-medium">{notification.message}</span>
+          {toast.type === 'error' ? <AlertCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
+          {toast.message}
         </div>
       )}
 
-      <div className="max-w-5xl mx-auto space-y-6">
-        {/* Hero Card */}
-        <Card className="border-0 shadow-xl overflow-hidden">
-          <div className={`h-40 bg-gradient-to-r ${roleConfig.gradient} relative`}>
-            <div className="absolute inset-0 opacity-20" style={{backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)', backgroundSize: '40px 40px'}} />
+      <div className="max-w-4xl mx-auto px-4 py-8 space-y-5">
+
+        {/* === HERO CARD === */}
+        <div className="relative rounded-3xl overflow-hidden shadow-xl bg-white dark:bg-gray-900">
+          {/* Banner */}
+          <div className={`h-44 bg-gradient-to-r ${roleConfig.gradient} relative`}>
+            {/* Patrón decorativo */}
+            <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <pattern id="dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                  <circle cx="2" cy="2" r="1.5" fill="white" />
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#dots)" />
+            </svg>
+            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/20 to-transparent" />
           </div>
-          <CardContent className="relative pb-6 px-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 -mt-16">
-              <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-                <Avatar className="h-28 w-28 ring-4 ring-white dark:ring-gray-900 shadow-2xl">
-                  {avatarPreview && <AvatarImage src={avatarPreview} />}
-                  <AvatarFallback className={`bg-gradient-to-br ${roleConfig.gradient} text-white text-3xl font-bold`}>
-                    {getInitials(user.nombre)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                  {uploadingAvatar ? <Loader2 className="h-7 w-7 text-white animate-spin" /> : <Camera className="h-7 w-7 text-white" />}
+
+          {/* Info del usuario */}
+          <div className="px-6 pb-6">
+            <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-14 mb-4">
+              {/* Avatar */}
+              <div className="relative group w-fit">
+                <div className="ring-4 ring-white dark:ring-gray-900 rounded-full shadow-xl">
+                  <Avatar className="h-28 w-28">
+                    {avatarPreview && <AvatarImage src={avatarPreview} className="object-cover" />}
+                    <AvatarFallback className={`bg-gradient-to-br ${roleConfig.gradient} text-white text-3xl font-bold`}>
+                      {getInitials(user.nombre)}
+                    </AvatarFallback>
+                  </Avatar>
                 </div>
+                <button onClick={() => fileInputRef.current?.click()}
+                  className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 cursor-pointer">
+                  {uploadingAvatar
+                    ? <Loader2 className="h-7 w-7 text-white animate-spin" />
+                    : <Camera className="h-7 w-7 text-white" />}
+                </button>
                 <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
               </div>
-              <div className="flex-1 pb-2">
-                <div className="flex flex-wrap items-center gap-3 mb-1">
-                  <h1 className="text-2xl font-bold">{user.nombre || 'Sin nombre'}</h1>
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${roleConfig.badge}`}>
+
+              {/* Nombre y rol */}
+              <div className="flex-1 sm:pb-2">
+                <div className="flex flex-wrap items-center gap-2 mb-1">
+                  <h1 className="text-2xl font-bold tracking-tight">{user.nombre || 'Sin nombre'}</h1>
+                  <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${roleConfig.soft}`}>
                     <RoleIcon className="h-3 w-3" />
                     {roleConfig.label}
                   </span>
                 </div>
-                <p className="text-muted-foreground">{user.email}</p>
+                <p className="text-muted-foreground text-sm flex items-center gap-1.5">
+                  <Mail className="h-3.5 w-3.5" />
+                  {user.email}
+                </p>
+                {user.telefono && (
+                  <p className="text-muted-foreground text-sm flex items-center gap-1.5 mt-0.5">
+                    <Phone className="h-3.5 w-3.5" />
+                    {user.telefono}
+                  </p>
+                )}
               </div>
-              {/* Stats rápidas */}
-              <div className="flex gap-4 pb-2">
-                {[
-                  { icon: Activity, label: 'Activo', value: 'Hoy' },
-                  { icon: Star, label: 'Miembro', value: 'Desde 2025' },
-                ].map((stat, i) => (
-                  <div key={i} className="text-center">
-                    <stat.icon className="h-5 w-5 mx-auto text-muted-foreground mb-1" />
-                    <p className="text-xs font-semibold">{stat.value}</p>
-                    <p className="text-xs text-muted-foreground">{stat.label}</p>
-                  </div>
-                ))}
+
+              {/* Botón editar */}
+              <button onClick={() => { setActiveTab('info'); setEditMode(true); }}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-gradient-to-r ${roleConfig.gradient} text-white shadow-md hover:opacity-90 transition-opacity sm:mb-2`}>
+                <Edit2 className="h-4 w-4" />
+                Editar perfil
+              </button>
+            </div>
+
+            {/* Stats */}
+            <div className="flex gap-6 pt-3 border-t border-gray-100 dark:border-gray-800">
+              <div className="text-center">
+                <p className="text-lg font-bold">—</p>
+                <p className="text-xs text-muted-foreground">Cursos</p>
+              </div>
+              <div className="text-center">
+                <p className="text-lg font-bold">—</p>
+                <p className="text-xs text-muted-foreground">Tareas</p>
+              </div>
+              <div className="text-center">
+                <p className="text-lg font-bold capitalize">{user.rol || '—'}</p>
+                <p className="text-xs text-muted-foreground">Rol</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        {/* Tabs */}
-        <div className="flex gap-1 p-1 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+        {/* === TABS === */}
+        <div className="flex gap-1 p-1 bg-white dark:bg-gray-900 rounded-2xl shadow-sm">
           {[
-            { id: 'info', label: 'Información Personal', icon: Edit3 },
+            { id: 'info', label: 'Información', icon: User },
             { id: 'password', label: 'Contraseña', icon: Lock },
           ].map(tab => (
-            <button key={tab.id} onClick={() => setActiveSection(tab.id)}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                activeSection === tab.id
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-medium transition-all ${
+                activeTab === tab.id
                   ? `bg-gradient-to-r ${roleConfig.gradient} text-white shadow-md`
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
+                  : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800'
               }`}>
               <tab.icon className="h-4 w-4" />
               {tab.label}
@@ -176,103 +220,146 @@ export default function ProfilePage() {
           ))}
         </div>
 
-        {/* Información Personal */}
-        {activeSection === 'info' && (
-          <Card className="border-0 shadow-lg">
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <div className={`p-2 rounded-lg bg-gradient-to-br ${roleConfig.gradient}`}>
-                  <User className="h-4 w-4 text-white" />
-                </div>
-                Información Personal
-              </CardTitle>
-              <CardDescription>Actualiza tu nombre, teléfono y foto de perfil</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleUpdateProfile} className="space-y-5">
-                <div className="grid md:grid-cols-2 gap-5">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Nombre Completo</label>
+        {/* === INFORMACIÓN PERSONAL === */}
+        {activeTab === 'info' && (
+          <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-sm p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-lg font-semibold">Información Personal</h2>
+                <p className="text-sm text-muted-foreground">Actualiza tus datos de perfil</p>
+              </div>
+              {!editMode && (
+                <button onClick={() => setEditMode(true)}
+                  className="flex items-center gap-1.5 text-sm font-medium text-violet-600 hover:text-violet-700">
+                  <Edit2 className="h-4 w-4" /> Editar
+                </button>
+              )}
+            </div>
+
+            {!editMode ? (
+              /* Vista de solo lectura */
+              <div className="space-y-4">
+                {[
+                  { icon: User, label: 'Nombre completo', value: user.nombre || 'Sin nombre' },
+                  { icon: Mail, label: 'Correo electrónico', value: user.email },
+                  { icon: Phone, label: 'Teléfono', value: user.telefono || 'No especificado' },
+                  { icon: RoleIcon, label: 'Rol', value: roleConfig.label },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 dark:bg-gray-800">
+                    <div className={`p-2.5 rounded-xl bg-gradient-to-br ${roleConfig.gradient}`}>
+                      <item.icon className="h-4 w-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">{item.label}</p>
+                      <p className="text-sm font-medium">{item.value}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              /* Formulario de edición */
+              <form onSubmit={handleUpdateProfile} className="space-y-4">
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Nombre completo</label>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                       <Input value={formData.nombre} onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                        placeholder="Tu nombre completo" className="pl-10 h-11 rounded-xl" />
+                        placeholder="Tu nombre completo" className="pl-9 h-11 rounded-xl" />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Correo Electrónico</label>
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Correo electrónico</label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input value={formData.email} disabled className="pl-10 h-11 rounded-xl bg-gray-50 dark:bg-gray-800 cursor-not-allowed" />
+                      <Input value={formData.email} disabled className="pl-9 h-11 rounded-xl bg-gray-50 dark:bg-gray-800 opacity-60 cursor-not-allowed" />
                     </div>
-                    <p className="text-xs text-muted-foreground">El correo no se puede modificar</p>
+                    <p className="text-xs text-muted-foreground">No se puede modificar</p>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Teléfono</label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                       <Input value={formData.telefono} onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
-                        placeholder="+51 999 999 999" className="pl-10 h-11 rounded-xl" />
+                        placeholder="+51 999 999 999" className="pl-9 h-11 rounded-xl" />
                     </div>
                   </div>
                 </div>
-                <Button type="submit" disabled={saving || uploadingAvatar}
-                  className={`h-11 px-8 rounded-xl bg-gradient-to-r ${roleConfig.gradient} hover:opacity-90 transition-opacity`}>
-                  {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Guardando...</> : <><Save className="h-4 w-4 mr-2" />Guardar Cambios</>}
-                </Button>
+                <div className="flex gap-3 pt-2">
+                  <Button type="submit" disabled={saving}
+                    className={`h-11 px-6 rounded-xl bg-gradient-to-r ${roleConfig.gradient} hover:opacity-90 shadow-md`}>
+                    {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Guardando...</> : <><Save className="h-4 w-4 mr-2" />Guardar cambios</>}
+                  </Button>
+                  <Button type="button" variant="outline" onClick={() => setEditMode(false)} className="h-11 px-6 rounded-xl">
+                    Cancelar
+                  </Button>
+                </div>
               </form>
-            </CardContent>
-          </Card>
+            )}
+          </div>
         )}
 
-        {/* Cambiar Contraseña */}
-        {activeSection === 'password' && (
-          <Card className="border-0 shadow-lg">
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <div className={`p-2 rounded-lg bg-gradient-to-br ${roleConfig.gradient}`}>
-                  <Lock className="h-4 w-4 text-white" />
+        {/* === CONTRASEÑA === */}
+        {activeTab === 'password' && (
+          <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-sm p-6">
+            <div className="mb-6">
+              <h2 className="text-lg font-semibold">Cambiar Contraseña</h2>
+              <p className="text-sm text-muted-foreground">Elige una contraseña segura de al menos 6 caracteres</p>
+            </div>
+            <form onSubmit={handleChangePassword} className="space-y-4 max-w-md">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Nueva contraseña</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input type={showPassword ? 'text' : 'password'} value={passwordData.newPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                    placeholder="Mínimo 6 caracteres" className="pl-9 pr-10 h-11 rounded-xl" />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
-                Cambiar Contraseña
-              </CardTitle>
-              <CardDescription>Elige una contraseña segura de al menos 6 caracteres</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleChangePassword} className="space-y-5 max-w-md">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Nueva Contraseña</label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <Input type={showPassword ? 'text' : 'password'} value={passwordData.newPassword}
-                      onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                      placeholder="Mínimo 6 caracteres" className="pl-10 pr-10 h-11 rounded-xl" />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Confirmar contraseña</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input type={showConfirm ? 'text' : 'password'} value={passwordData.confirmPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                    placeholder="Repite la contraseña" className="pl-9 pr-10 h-11 rounded-xl" />
+                  <button type="button" onClick={() => setShowConfirm(!showConfirm)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                    {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Indicador de fortaleza */}
+              {passwordData.newPassword && (
+                <div className="space-y-1.5">
+                  <div className="flex gap-1">
+                    {[1,2,3,4].map(i => (
+                      <div key={i} className={`h-1.5 flex-1 rounded-full transition-colors ${
+                        passwordData.newPassword.length >= i * 3
+                          ? i <= 1 ? 'bg-red-400' : i <= 2 ? 'bg-yellow-400' : i <= 3 ? 'bg-blue-400' : 'bg-emerald-400'
+                          : 'bg-gray-200'
+                      }`} />
+                    ))}
                   </div>
+                  <p className="text-xs text-muted-foreground">
+                    {passwordData.newPassword.length < 4 ? 'Muy débil' : passwordData.newPassword.length < 7 ? 'Débil' : passwordData.newPassword.length < 10 ? 'Buena' : 'Muy segura'}
+                  </p>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Confirmar Contraseña</label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <Input type={showNewPassword ? 'text' : 'password'} value={passwordData.confirmPassword}
-                      onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                      placeholder="Repite la contraseña" className="pl-10 pr-10 h-11 rounded-xl" />
-                    <button type="button" onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                      {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </div>
-                <Button type="submit" disabled={saving}
-                  className={`h-11 px-8 rounded-xl bg-gradient-to-r ${roleConfig.gradient} hover:opacity-90 transition-opacity`}>
-                  {saving ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Actualizando...</> : <><Lock className="h-4 w-4 mr-2" />Cambiar Contraseña</>}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+              )}
+
+              <Button type="submit" disabled={savingPassword}
+                className={`h-11 px-6 rounded-xl bg-gradient-to-r ${roleConfig.gradient} hover:opacity-90 shadow-md`}>
+                {savingPassword ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Actualizando...</> : <><Lock className="h-4 w-4 mr-2" />Actualizar contraseña</>}
+              </Button>
+            </form>
+          </div>
         )}
+
       </div>
     </div>
   );
