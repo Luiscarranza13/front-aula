@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getCourses, getTasks } from '@/lib/api-new';
+import { getCourses, getTasks } from '@/lib/api';
 import { DashboardSkeleton } from '@/components/Skeleton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
