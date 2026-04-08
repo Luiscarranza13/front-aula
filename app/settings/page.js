@@ -7,15 +7,13 @@ import { updateUser } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   User, Bell, Shield, Palette, Moon, Sun, Monitor,
   Check, Save, Eye, EyeOff, Mail, Lock, AlertCircle,
   CheckCircle2, GraduationCap, BookOpen, Loader2,
-  Zap, Globe, ChevronRight, LogOut, Trash2, Key
+  Zap, Globe, ChevronRight, LogOut, Key
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 
 const SECTIONS = [
   { id: 'cuenta', label: 'Cuenta', icon: User },
@@ -26,7 +24,6 @@ const SECTIONS = [
 
 export default function SettingsPage() {
   const { user, updateUserData, logout } = useAuth();
-  const router = useRouter();
   const [activeSection, setActiveSection] = useState('cuenta');
   const [saving, setSaving] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
@@ -36,7 +33,7 @@ export default function SettingsPage() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [notifications, setNotifications] = useState({ email: true, push: false, tasks: true, forums: true, grades: true });
   const [profileData, setProfileData] = useState({ nombre: '', email: '', telefono: '' });
-  const [passwordData, setPasswordData] = useState({ newPassword: '', confirmPassword: '' });
+  const [passwordData, setPasswordData] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
 
   useEffect(() => {
     if (user) setProfileData({ nombre: user.nombre || '', email: user.email || '', telefono: user.telefono || '' });
@@ -64,12 +61,20 @@ export default function SettingsPage() {
   const handleChangePassword = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) return showToast('Las contraseñas no coinciden', 'error');
     if (passwordData.newPassword.length < 6) return showToast('Mínimo 6 caracteres', 'error');
+    if (!passwordData.currentPassword) return showToast('Ingresa tu contraseña actual', 'error');
     setSavingPassword(true);
     try {
+      // Re-autenticar con contraseña actual
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: passwordData.currentPassword
+      });
+      if (signInError) throw new Error('Contraseña actual incorrecta');
+      
       const { error } = await supabase.auth.updateUser({ password: passwordData.newPassword });
       if (error) throw error;
-      setPasswordData({ newPassword: '', confirmPassword: '' });
-      showToast('Contraseña actualizada');
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      showToast('Contraseña actualizada correctamente');
     } catch (e) {
       showToast(e.message, 'error');
     } finally {
@@ -237,6 +242,14 @@ export default function SettingsPage() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="space-y-1.5 sm:col-span-2">
+                        <label className="text-sm font-medium">Contraseña actual</label>
+                        <div className="relative">
+                          <Input type="password" value={passwordData.currentPassword}
+                            onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                            placeholder="Tu contraseña actual" className="h-10 rounded-xl" />
+                        </div>
+                      </div>
                       <div className="space-y-1.5">
                         <label className="text-sm font-medium">Nueva contraseña</label>
                         <div className="relative">
