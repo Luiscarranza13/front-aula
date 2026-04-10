@@ -13,13 +13,28 @@ export const AuthProvider = ({ children }) => {
   const router = useRouter();
 
   useEffect(() => {
-    // Obtener sesión activa al cargar
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session) {
-        await loadUserProfile(session);
-      }
+    // Timeout of 3 seconds to prevent infinite Cargar screens if Supabase fails
+    const timer = setTimeout(() => {
       setLoading(false);
-    });
+    }, 5000);
+
+    const initAuth = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error('Error fetching session:', error);
+        } else if (session) {
+          await loadUserProfile(session);
+        }
+      } catch (e) {
+        console.error('Critical auth error:', e);
+      } finally {
+        clearTimeout(timer);
+        setLoading(false);
+      }
+    };
+
+    initAuth();
 
     // Escuchar cambios de sesión
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -31,7 +46,10 @@ export const AuthProvider = ({ children }) => {
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      clearTimeout(timer);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const loadUserProfile = async (session) => {
@@ -118,4 +136,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
