@@ -55,34 +55,8 @@ export default function AdminCoursesPage() {
   const [viewMode, setViewMode] = useState('grid');
   const [saving, setSaving] = useState(false);
   const [notification, setNotification] = useState(null);
-  const [activeTab, setActiveTab] = useState('tasks');
-  const [contentData, setContentData] = useState({ tasks: [], resources: [], forums: [] });
-  const [loadingContent, setLoadingContent] = useState(false);
 
-  // Content modals
-  const [showTaskModal, setShowTaskModal] = useState(false);
-  const [showResourceModal, setShowResourceModal] = useState(false);
-  const [showForumModal, setShowForumModal] = useState(false);
-  const [editingItem, setEditingItem] = useState(null);
-  const [deletingItem, setDeletingItem] = useState(null);
-  const [showDeleteItemModal, setShowDeleteItemModal] = useState(false);
-  const [deleteItemType, setDeleteItemType] = useState('');
 
-  const [formData, setFormData] = useState({
-    titulo: '', descripcion: '', grado: '', seccion: '', docenteId: '',
-  });
-
-  const [taskForm, setTaskForm] = useState({
-    titulo: '', descripcion: '', fecha_entrega: '', estado: 'pendiente'
-  });
-
-  const [resourceForm, setResourceForm] = useState({
-    nombre_archivo: '', tipo_recurso: 'documento', url: '', descripcion: ''
-  });
-
-  const [forumForm, setForumForm] = useState({
-    titulo: '', descripcion: ''
-  });
 
   useEffect(() => {
     if (!isAdmin() && !isDocente()) {
@@ -118,26 +92,6 @@ export default function AdminCoursesPage() {
       showNotification('Error al cargar datos', 'error');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchCourseContent = async (courseId) => {
-    setLoadingContent(true);
-    try {
-      const [tasks, resources, forums] = await Promise.all([
-        getTasksByCourse(courseId).catch(() => []),
-        getResourcesByCourse(courseId).catch(() => []),
-        getForumsByCourse(courseId).catch(() => []),
-      ]);
-      setContentData({
-        tasks,
-        resources,
-        forums,
-      });
-    } catch (error) {
-      showNotification('Error al cargar contenido', 'error');
-    } finally {
-      setLoadingContent(false);
     }
   };
 
@@ -183,7 +137,6 @@ export default function AdminCoursesPage() {
       await deleteCourse(deletingCourse.id);
       if (selectedCourse?.id === deletingCourse.id) {
         setSelectedCourse(null);
-        setContentData({ tasks: [], resources: [], forums: [] });
       }
       await fetchData();
       showNotification('Curso eliminado correctamente');
@@ -207,109 +160,7 @@ export default function AdminCoursesPage() {
   };
 
   const openContentManager = (course) => {
-    setSelectedCourse(course);
-    setActiveTab('tasks');
-    fetchCourseContent(course.id);
-    setShowContentModal(true);
-  };
-
-  // Task handlers
-  const handleTaskSubmit = async (e) => {
-    e.preventDefault();
-    setSaving(true);
-    try {
-      const data = { ...taskForm, cursoId: selectedCourse.id };
-      if (editingItem) {
-        await updateTask(editingItem.id, data);
-        showNotification('Tarea actualizada');
-      } else {
-        await createTask(data);
-        showNotification('Tarea creada');
-      }
-      setShowTaskModal(false);
-      setEditingItem(null);
-      setTaskForm({ titulo: '', descripcion: '', fecha_entrega: '', estado: 'pendiente' });
-      fetchCourseContent(selectedCourse.id);
-    } catch (error) {
-      showNotification('Error: ' + error.message, 'error');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  // Resource handlers
-  const handleResourceSubmit = async (e) => {
-    e.preventDefault();
-    setSaving(true);
-    try {
-      const data = { ...resourceForm, cursoId: selectedCourse.id };
-      if (editingItem) {
-        await updateResource(editingItem.id, data);
-        showNotification('Recurso actualizado');
-      } else {
-        await createResource(data);
-        showNotification('Recurso creado');
-      }
-      setShowResourceModal(false);
-      setEditingItem(null);
-      setResourceForm({ nombre_archivo: '', tipo_recurso: 'documento', url: '', descripcion: '' });
-      fetchCourseContent(selectedCourse.id);
-    } catch (error) {
-      showNotification('Error: ' + error.message, 'error');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  // Forum handlers
-  const handleForumSubmit = async (e) => {
-    e.preventDefault();
-    setSaving(true);
-    try {
-      const data = { ...forumForm, cursoId: selectedCourse.id };
-      if (editingItem) {
-        await updateForum(editingItem.id, data);
-        showNotification('Foro actualizado');
-      } else {
-        await createForum(data);
-        showNotification('Foro creado');
-      }
-      setShowForumModal(false);
-      setEditingItem(null);
-      setForumForm({ titulo: '', descripcion: '' });
-      fetchCourseContent(selectedCourse.id);
-    } catch (error) {
-      showNotification('Error: ' + error.message, 'error');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleDeleteItem = async () => {
-    if (!deletingItem) return;
-    try {
-      if (deleteItemType === 'task') await deleteTask(deletingItem.id);
-      else if (deleteItemType === 'resource') await deleteResource(deletingItem.id);
-      else if (deleteItemType === 'forum') await deleteForum(deletingItem.id);
-      showNotification('Eliminado correctamente');
-      fetchCourseContent(selectedCourse.id);
-    } catch (error) {
-      showNotification('Error: ' + error.message, 'error');
-    }
-    setDeletingItem(null);
-    setShowDeleteItemModal(false);
-  };
-
-  const handleFileUpload = async (files) => {
-    if (files && files.length > 0) {
-      const file = files[0];
-      setResourceForm(prev => ({
-        ...prev,
-        nombre_archivo: file.originalName || file.filename,
-        url: file.url || getUploadUrl(file.filename)
-      }));
-      showNotification('Archivo subido correctamente');
-    }
+    router.push(`/courses/${course.id}`);
   };
 
   const uniqueGrados = [...new Set(courses.map(c => c.grado))];
@@ -321,12 +172,6 @@ export default function AdminCoursesPage() {
     'from-orange-500 to-orange-600',
     'from-pink-500 to-pink-600',
     'from-indigo-500 to-indigo-600'
-  ];
-
-  const tabConfig = [
-    { id: 'tasks', label: 'Tareas', icon: ClipboardList, count: contentData.tasks.length },
-    { id: 'resources', label: 'Recursos', icon: FileText, count: contentData.resources.length },
-    { id: 'forums', label: 'Foros', icon: MessageSquare, count: contentData.forums.length },
   ];
 
   if (loading) return <DashboardSkeleton />;
@@ -473,322 +318,73 @@ export default function AdminCoursesPage() {
         </Card>
       )}
 
-      {/* Modal de crear/editar curso */}
+      {/* Modal de crear/editar curso Ultra Styling */}
       <Modal isOpen={showModal} onClose={() => setShowModal(false)} title={editingCourse ? 'Editar Curso' : 'Nuevo Curso'} size="md">
-        <form onSubmit={saveCourse} className="space-y-5">
+        <form onSubmit={saveCourse} className="space-y-6">
+          <div className="bg-slate-50/50 dark:bg-slate-900/50 p-6 -mx-6 -mt-4 mb-4 border-b border-slate-100 dark:border-slate-800">
+             <div className="flex items-center gap-3">
+               <div className="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                 <GraduationCap className="h-5 w-5" />
+               </div>
+               <div>
+                  <h3 className="font-bold text-slate-900 dark:text-white">{editingCourse ? 'Configuración del Curso' : 'Apertura de Curso'}</h3>
+                  <p className="text-xs text-slate-500">Configura los metadatos y asigna un docente titular.</p>
+               </div>
+             </div>
+          </div>
+
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Título del Curso *</label>
+            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Título del Curso <span className="text-red-500">*</span></label>
             <Input value={formData.titulo} onChange={(e) => setFormData({ ...formData, titulo: e.target.value })} required
-              placeholder="Ej: Matemáticas Avanzadas" className="h-11 rounded-xl border-gray-200 focus:border-indigo-500 focus:ring-indigo-500" />
+              placeholder="Ej: Desarrollo Fullstack Avanzado" className="h-11 rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 focus:border-indigo-500 focus:ring-indigo-500" />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Descripción</label>
+            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Resumen y Objetivos</label>
             <textarea value={formData.descripcion} onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
-              placeholder="Descripción detallada del curso..." rows={3}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl resize-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all" />
+              placeholder="Breve descripción del syllabus y aprendizajes esperados..." rows={3}
+              className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl resize-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all text-sm" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Grado *</label>
+              <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Ciclo Académico <span className="text-red-500">*</span></label>
               <select value={formData.grado} onChange={(e) => setFormData({ ...formData, grado: e.target.value })} required
-                className="w-full h-11 px-4 border border-gray-200 rounded-xl bg-white dark:bg-gray-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20">
-                <option value="">Seleccionar</option>
-                {['1ro', '2do', '3ro', '4to', '5to', '6to'].map(g => <option key={g} value={g}>{g}</option>)}
+                className="w-full h-11 px-4 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-900/50 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 text-sm appearance-none cursor-pointer">
+                <option value="">-- Seleccionar --</option>
+                {['1ro', '2do', '3ro', '4to', '5to', '6to', 'CGEU-239', 'PIAD-527'].map(g => <option key={g} value={g}>{g}</option>)}
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Sección *</label>
+              <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Bloque / Sección <span className="text-red-500">*</span></label>
               <select value={formData.seccion} onChange={(e) => setFormData({ ...formData, seccion: e.target.value })} required
-                className="w-full h-11 px-4 border border-gray-200 rounded-xl bg-white dark:bg-gray-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20">
-                <option value="">Seleccionar</option>
-                {['A', 'B', 'C', 'D'].map(s => <option key={s} value={s}>{s}</option>)}
+                className="w-full h-11 px-4 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-900/50 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 text-sm appearance-none cursor-pointer">
+                <option value="">-- Seleccionar --</option>
+                {['A', 'B', 'C', 'D', 'TEC-NRC_17315', 'TEC-NRC_17325'].map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Docente Asignado</label>
-            <select value={formData.docenteId} onChange={(e) => setFormData({ ...formData, docenteId: e.target.value })}
-              className="w-full h-11 px-4 border border-gray-200 rounded-xl bg-white dark:bg-gray-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20">
-              <option value="">Sin asignar</option>
-              {users.map((user) => <option key={user.id} value={user.id}>{user.nombre}</option>)}
-            </select>
-          </div>
-          <ModalFooter>
-            <Button type="button" variant="outline" onClick={() => setShowModal(false)} className="rounded-xl">Cancelar</Button>
-            <Button type="submit" disabled={saving} className="rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700">
-              {saving ? 'Guardando...' : editingCourse ? 'Actualizar' : 'Crear Curso'}
-            </Button>
-          </ModalFooter>
-        </form>
-      </Modal>
-
-      {/* Modal de gestión de contenido */}
-      <Modal isOpen={showContentModal} onClose={() => setShowContentModal(false)} 
-        title={`Contenido: ${selectedCourse?.titulo || ''}`} size="xl">
-        <div className="space-y-6">
-          {/* Tabs */}
-          <div className="flex gap-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-xl">
-            {tabConfig.map(tab => (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                  activeTab === tab.id ? 'bg-white dark:bg-gray-700 shadow-sm text-indigo-600' : 'text-gray-600 hover:text-gray-900'
-                }`}>
-                <tab.icon className="h-4 w-4" />
-                {tab.label}
-                <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">{tab.count}</Badge>
-              </button>
-            ))}
-          </div>
-
-          {loadingContent ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-            </div>
-          ) : (
-            <>
-              {/* Tareas */}
-              {activeTab === 'tasks' && (
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-semibold">Tareas del curso</h3>
-                    <Button size="sm" onClick={() => { setEditingItem(null); setTaskForm({ titulo: '', descripcion: '', fecha_entrega: '', estado: 'pendiente' }); setShowTaskModal(true); }}
-                      className="gap-1 bg-indigo-600 hover:bg-indigo-700">
-                      <Plus className="h-4 w-4" /> Nueva Tarea
-                    </Button>
-                  </div>
-                  {contentData.tasks.length === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <ClipboardList className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                      <p>No hay tareas creadas</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {contentData.tasks.map(task => (
-                        <div key={task.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                          <div className="flex-1">
-                            <h4 className="font-medium">{task.titulo}</h4>
-                            <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
-                              <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {task.fecha_entrega ? new Date(task.fecha_entrega).toLocaleDateString() : 'Sin fecha'}</span>
-                              <Badge className={task.estado === 'completada' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}>{task.estado}</Badge>
-                            </div>
-                          </div>
-                          <div className="flex gap-1">
-                            <Button variant="ghost" size="sm" onClick={() => { setEditingItem(task); setTaskForm({ titulo: task.titulo, descripcion: task.descripcion || '', fecha_entrega: task.fecha_entrega?.split('T')[0] || '', estado: task.estado }); setShowTaskModal(true); }}>
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm" className="text-red-600" onClick={() => { setDeletingItem(task); setDeleteItemType('task'); setShowDeleteItemModal(true); }}>
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Recursos */}
-              {activeTab === 'resources' && (
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-semibold">Recursos del curso</h3>
-                    <Button size="sm" onClick={() => { setEditingItem(null); setResourceForm({ nombre_archivo: '', tipo_recurso: 'documento', url: '', descripcion: '' }); setShowResourceModal(true); }}
-                      className="gap-1 bg-indigo-600 hover:bg-indigo-700">
-                      <Plus className="h-4 w-4" /> Nuevo Recurso
-                    </Button>
-                  </div>
-                  {contentData.resources.length === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                      <p>No hay recursos creados</p>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {contentData.resources.map(resource => (
-                        <div key={resource.id} className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                          <div className="p-2 bg-indigo-100 dark:bg-indigo-900 rounded-lg">
-                            <FileText className="h-5 w-5 text-indigo-600" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-medium truncate">{resource.nombre_archivo}</h4>
-                            <Badge variant="secondary" className="text-xs">{resource.tipo_recurso}</Badge>
-                          </div>
-                          <div className="flex gap-1">
-                            {resource.url && (
-                              <Button variant="ghost" size="sm" asChild>
-                                <a href={resource.url} target="_blank" rel="noopener noreferrer"><Eye className="h-4 w-4" /></a>
-                              </Button>
-                            )}
-                            <Button variant="ghost" size="sm" onClick={() => { setEditingItem(resource); setResourceForm({ nombre_archivo: resource.nombre_archivo, tipo_recurso: resource.tipo_recurso, url: resource.url || '', descripcion: resource.descripcion || '' }); setShowResourceModal(true); }}>
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm" className="text-red-600" onClick={() => { setDeletingItem(resource); setDeleteItemType('resource'); setShowDeleteItemModal(true); }}>
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Foros */}
-              {activeTab === 'forums' && (
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-semibold">Foros del curso</h3>
-                    <Button size="sm" onClick={() => { setEditingItem(null); setForumForm({ titulo: '', descripcion: '' }); setShowForumModal(true); }}
-                      className="gap-1 bg-indigo-600 hover:bg-indigo-700">
-                      <Plus className="h-4 w-4" /> Nuevo Foro
-                    </Button>
-                  </div>
-                  {contentData.forums.length === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <MessageSquare className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                      <p>No hay foros creados</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {contentData.forums.map(forum => (
-                        <div key={forum.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                          <div className="flex items-center gap-3">
-                            <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
-                              <MessageSquare className="h-5 w-5 text-purple-600" />
-                            </div>
-                            <div>
-                              <h4 className="font-medium">{forum.titulo}</h4>
-                              {forum.descripcion && <p className="text-sm text-muted-foreground line-clamp-1">{forum.descripcion}</p>}
-                            </div>
-                          </div>
-                          <div className="flex gap-1">
-                            <Button variant="ghost" size="sm" onClick={() => { setEditingItem(forum); setForumForm({ titulo: forum.titulo, descripcion: forum.descripcion || '' }); setShowForumModal(true); }}>
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm" className="text-red-600" onClick={() => { setDeletingItem(forum); setDeleteItemType('forum'); setShowDeleteItemModal(true); }}>
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      </Modal>
-
-      {/* Modal de tarea */}
-      <Modal isOpen={showTaskModal} onClose={() => setShowTaskModal(false)} title={editingItem ? 'Editar Tarea' : 'Nueva Tarea'} size="md">
-        <form onSubmit={handleTaskSubmit} className="space-y-5">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Título *</label>
-            <Input value={taskForm.titulo} onChange={(e) => setTaskForm({ ...taskForm, titulo: e.target.value })} required
-              placeholder="Ej: Ejercicios del capítulo 5" className="h-11 rounded-xl" />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Descripción</label>
-            <textarea value={taskForm.descripcion} onChange={(e) => setTaskForm({ ...taskForm, descripcion: e.target.value })}
-              placeholder="Instrucciones detalladas..." rows={3}
-              className="w-full px-4 py-3 border rounded-xl resize-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Fecha de entrega</label>
-              <Input type="date" value={taskForm.fecha_entrega} onChange={(e) => setTaskForm({ ...taskForm, fecha_entrega: e.target.value })}
-                className="h-11 rounded-xl" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Estado</label>
-              <select value={taskForm.estado} onChange={(e) => setTaskForm({ ...taskForm, estado: e.target.value })}
-                className="w-full h-11 px-4 border rounded-xl bg-white dark:bg-gray-800">
-                <option value="pendiente">Pendiente</option>
-                <option value="en_progreso">En Progreso</option>
-                <option value="completada">Completada</option>
+            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Instructor Designado</label>
+            <div className="relative">
+              <select value={formData.docenteId} onChange={(e) => setFormData({ ...formData, docenteId: e.target.value })}
+                className="w-full h-11 px-4 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-900/50 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 text-sm appearance-none cursor-pointer">
+                <option value="">Colocar en espera o sin titular</option>
+                {users.map((user) => <option key={user.id} value={user.id}>{user.nombre} {user.apellido}</option>)}
               </select>
+              <User className="h-4 w-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
           </div>
-          <ModalFooter>
-            <Button type="button" variant="outline" onClick={() => setShowTaskModal(false)} className="rounded-xl">Cancelar</Button>
-            <Button type="submit" disabled={saving} className="rounded-xl bg-indigo-600 hover:bg-indigo-700">
-              {saving ? 'Guardando...' : editingItem ? 'Actualizar' : 'Crear'}
-            </Button>
-          </ModalFooter>
-        </form>
-      </Modal>
-
-      {/* Modal de recurso */}
-      <Modal isOpen={showResourceModal} onClose={() => setShowResourceModal(false)} title={editingItem ? 'Editar Recurso' : 'Nuevo Recurso'} size="md">
-        <form onSubmit={handleResourceSubmit} className="space-y-5">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Nombre del archivo *</label>
-            <Input value={resourceForm.nombre_archivo} onChange={(e) => setResourceForm({ ...resourceForm, nombre_archivo: e.target.value })} required
-              placeholder="Ej: Guía de estudio.pdf" className="h-11 rounded-xl" />
+          <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+            <button type="button" onClick={() => setShowModal(false)} className="px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Cancelar</button>
+            <button type="submit" disabled={saving} className="px-5 py-2.5 rounded-xl text-sm font-medium bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:transform-none">
+              {saving ? 'Procesando...' : editingCourse ? 'Guardar Cambios' : 'Confirmar y Crear'}
+            </button>
           </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Tipo de recurso</label>
-            <select value={resourceForm.tipo_recurso} onChange={(e) => setResourceForm({ ...resourceForm, tipo_recurso: e.target.value })}
-              className="w-full h-11 px-4 border rounded-xl bg-white dark:bg-gray-800">
-              <option value="documento">Documento</option>
-              <option value="presentacion">Presentación</option>
-              <option value="video">Video</option>
-              <option value="audio">Audio</option>
-              <option value="enlace">Enlace</option>
-              <option value="otro">Otro</option>
-            </select>
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Subir archivo</label>
-            <FileUpload onUploadComplete={handleFileUpload} accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.mp4,.mp3" />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">O ingresa URL directamente</label>
-            <Input value={resourceForm.url} onChange={(e) => setResourceForm({ ...resourceForm, url: e.target.value })}
-              placeholder="https://..." className="h-11 rounded-xl" />
-          </div>
-          <ModalFooter>
-            <Button type="button" variant="outline" onClick={() => setShowResourceModal(false)} className="rounded-xl">Cancelar</Button>
-            <Button type="submit" disabled={saving} className="rounded-xl bg-indigo-600 hover:bg-indigo-700">
-              {saving ? 'Guardando...' : editingItem ? 'Actualizar' : 'Crear'}
-            </Button>
-          </ModalFooter>
-        </form>
-      </Modal>
-
-      {/* Modal de foro */}
-      <Modal isOpen={showForumModal} onClose={() => setShowForumModal(false)} title={editingItem ? 'Editar Foro' : 'Nuevo Foro'} size="md">
-        <form onSubmit={handleForumSubmit} className="space-y-5">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Título del foro *</label>
-            <Input value={forumForm.titulo} onChange={(e) => setForumForm({ ...forumForm, titulo: e.target.value })} required
-              placeholder="Ej: Dudas sobre el tema 3" className="h-11 rounded-xl" />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Descripción</label>
-            <textarea value={forumForm.descripcion} onChange={(e) => setForumForm({ ...forumForm, descripcion: e.target.value })}
-              placeholder="Describe el propósito del foro..." rows={3}
-              className="w-full px-4 py-3 border rounded-xl resize-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" />
-          </div>
-          <ModalFooter>
-            <Button type="button" variant="outline" onClick={() => setShowForumModal(false)} className="rounded-xl">Cancelar</Button>
-            <Button type="submit" disabled={saving} className="rounded-xl bg-indigo-600 hover:bg-indigo-700">
-              {saving ? 'Guardando...' : editingItem ? 'Actualizar' : 'Crear'}
-            </Button>
-          </ModalFooter>
         </form>
       </Modal>
 
       {/* Modal de confirmación de eliminación de curso */}
       <ConfirmModal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)} onConfirm={deleteCourseAndRefresh}
         title="Eliminar Curso" description={`¿Estás seguro de eliminar "${deletingCourse?.titulo}"? Se eliminarán todas las tareas, recursos y foros asociados.`}
-        confirmText="Eliminar" variant="danger" />
-
-      {/* Modal de confirmación de eliminación de item */}
-      <ConfirmModal isOpen={showDeleteItemModal} onClose={() => setShowDeleteItemModal(false)} onConfirm={handleDeleteItem}
-        title={`Eliminar ${deleteItemType === 'task' ? 'Tarea' : deleteItemType === 'resource' ? 'Recurso' : 'Foro'}`}
-        description={`¿Estás seguro de eliminar "${deletingItem?.titulo || deletingItem?.nombre_archivo}"?`}
         confirmText="Eliminar" variant="danger" />
     </div>
   );
