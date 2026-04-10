@@ -20,6 +20,7 @@ export default function ThemeToggle() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     const savedTheme = localStorage.getItem('theme') || 'system';
     Promise.resolve().then(() => {

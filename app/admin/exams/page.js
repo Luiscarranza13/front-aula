@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { getExams, getCourses, createExam, deleteExam, addExamQuestion } from '@/lib/api';
+import { getExams, getCourses, createExam, deleteExam } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,8 +10,8 @@ import { Badge } from '@/components/ui/badge';
 import Modal from '@/components/Modal';
 import { DashboardSkeleton } from '@/components/Skeleton';
 import { 
-  FileQuestion, Plus, Trash2, Edit, Eye, Clock, Users,
-  BookOpen, Calendar, CheckCircle, Settings
+  FileQuestion, Plus, Trash2, Clock, Users,
+  BookOpen, Settings
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -128,7 +128,7 @@ export default function AdminExamsPage() {
                     <div className="flex flex-wrap gap-4 text-sm text-slate-600">
                       <div className="flex items-center gap-1">
                         <BookOpen className="h-4 w-4" />
-                        <span>{exam.curso?.nombre}</span>
+                        <span>{exam.curso?.titulo || exam.curso?.nombre || 'Curso'}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
@@ -149,11 +149,6 @@ export default function AdminExamsPage() {
                     <Link href={`/admin/exams/${exam.id}`}>
                       <Button variant="outline" size="sm">
                         <Settings className="h-4 w-4 mr-1" /> Gestionar
-                      </Button>
-                    </Link>
-                    <Link href={`/admin/exams/${exam.id}/grades`}>
-                      <Button variant="outline" size="sm">
-                        <Eye className="h-4 w-4 mr-1" /> Calificaciones
                       </Button>
                     </Link>
                     <Button variant="outline" size="sm" onClick={() => handleDelete(exam.id)} className="text-red-600 hover:text-red-700">
@@ -201,7 +196,7 @@ export default function AdminExamsPage() {
             >
               <option value="">Seleccionar curso</option>
               {courses.map(c => (
-                <option key={c.id} value={c.id}>{c.nombre}</option>
+                <option key={c.id} value={c.id}>{c.titulo || c.nombre}</option>
               ))}
             </select>
           </div>

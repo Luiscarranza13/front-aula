@@ -12,6 +12,14 @@ import {
   Zap, Globe, ChevronRight
 } from 'lucide-react';
 
+const getHomePathForRole = (role) => {
+  if (role === 'admin' || role === 'docente' || role === 'profesor') {
+    return '/admin/courses';
+  }
+
+  return '/dashboard';
+};
+
 export default function LandingPage() {
   const router = useRouter();
   const { user, loading } = useAuth();
@@ -21,12 +29,12 @@ export default function LandingPage() {
 
   // Auto-avance del carrusel
   useEffect(() => {
-    const t = setInterval(() => setFeatIdx(i => (i + 1) % features.length), 1500);
+    const t = setInterval(() => setFeatIdx(i => (i + 1) % 6), 1500);
     return () => clearInterval(t);
   }, []);
 
   useEffect(() => {
-    if (!loading && user) router.push('/dashboard');
+    if (!loading && user) router.push(getHomePathForRole(user.rol));
   }, [user, loading, router]);
 
   useEffect(() => {

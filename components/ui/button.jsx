@@ -37,8 +37,8 @@ const Button = React.forwardRef(({ className, variant, size, asChild = false, ..
   if (asChild && props.children) {
     const child = React.Children.only(props.children)
     return React.cloneElement(child, {
+      ...props,
       className: cn(buttonVariants({ variant, size, className }), child.props.className),
-      ref,
     })
   }
   

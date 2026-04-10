@@ -85,6 +85,7 @@ export default function SettingsPage() {
   const roleConfig = {
     admin: { gradient: 'from-red-500 to-orange-500', label: 'Administrador', icon: Shield },
     docente: { gradient: 'from-blue-500 to-cyan-500', label: 'Docente', icon: BookOpen },
+    profesor: { gradient: 'from-blue-500 to-cyan-500', label: 'Profesor', icon: BookOpen },
     estudiante: { gradient: 'from-violet-500 to-purple-600', label: 'Estudiante', icon: GraduationCap },
   }[user?.rol] || { gradient: 'from-gray-500 to-gray-600', label: 'Usuario', icon: User };
 

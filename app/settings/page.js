@@ -89,6 +89,7 @@ export default function SettingsPage() {
   const roleConfig = {
     admin: { gradient: 'from-red-500 to-orange-500', label: 'Administrador', icon: Shield, color: 'text-red-600' },
     docente: { gradient: 'from-blue-500 to-cyan-500', label: 'Docente', icon: BookOpen, color: 'text-blue-600' },
+    profesor: { gradient: 'from-blue-500 to-cyan-500', label: 'Profesor', icon: BookOpen, color: 'text-blue-600' },
     estudiante: { gradient: 'from-violet-500 to-purple-600', label: 'Estudiante', icon: GraduationCap, color: 'text-violet-600' },
   }[user?.rol] || { gradient: 'from-gray-500 to-gray-600', label: 'Usuario', icon: User, color: 'text-gray-600' };
 
@@ -212,7 +213,7 @@ export default function SettingsPage() {
                         <p className="font-semibold">{roleConfig.label}</p>
                         <p className="text-sm text-muted-foreground">
                           {user?.rol === 'admin' && 'Acceso completo a todas las funciones del sistema'}
-                          {user?.rol === 'docente' && 'Puedes crear cursos, tareas y gestionar estudiantes'}
+                          {(user?.rol === 'docente' || user?.rol === 'profesor') && 'Puedes crear cursos, tareas y gestionar estudiantes'}
                           {user?.rol === 'estudiante' && 'Acceso a cursos, tareas, exámenes y recursos'}
                         </p>
                       </div>

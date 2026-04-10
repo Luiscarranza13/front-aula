@@ -49,7 +49,7 @@ export default function ReportsPage() {
 
   const usersByRole = [
     { label: 'Admins', value: users.filter(u => u.rol === 'admin').length, color: '#ef4444' },
-    { label: 'Docentes', value: users.filter(u => u.rol === 'docente').length, color: '#3b82f6' },
+    { label: 'Docentes', value: users.filter(u => u.rol === 'docente' || u.rol === 'profesor').length, color: '#3b82f6' },
     { label: 'Estudiantes', value: users.filter(u => u.rol === 'estudiante').length, color: '#22c55e' },
   ];
 

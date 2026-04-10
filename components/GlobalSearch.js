@@ -85,7 +85,7 @@ export default function GlobalSearch({ isOpen, onClose }) {
               </div>
             ) : !hasResults && !loading ? (
               <div className="p-8 text-center text-muted-foreground">
-                <p>No se encontraron resultados para "{query}"</p>
+                <p>No se encontraron resultados para &quot;{query}&quot;</p>
               </div>
             ) : (
               <div className="p-2">

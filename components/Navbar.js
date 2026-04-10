@@ -54,6 +54,7 @@ export default function Navbar({ onMenuClick }) {
     const colors = {
       admin: 'bg-red-500',
       docente: 'bg-blue-500',
+      profesor: 'bg-blue-500',
       estudiante: 'bg-green-500'
     };
     return colors[rol] || 'bg-gray-500';

@@ -23,7 +23,6 @@ const DropdownMenuTrigger = React.forwardRef(({ className, children, asChild = f
     const child = React.Children.only(children)
     return React.cloneElement(child, {
       ...props,
-      ref,
       className: cn(child.props.className),
     })
   }

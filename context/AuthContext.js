@@ -49,12 +49,14 @@ export const AuthProvider = ({ children }) => {
 
       if (typeof window !== 'undefined') {
         localStorage.setItem('user', JSON.stringify(fullUser));
+        localStorage.setItem('token', session.access_token);
       }
     } catch (e) {
       // Si falla cargar el perfil, igual dejamos al usuario logueado con los datos básicos
       setUser(session.user);
       if (typeof window !== 'undefined') {
         localStorage.setItem('user', JSON.stringify(session.user));
+        localStorage.setItem('token', session.access_token);
       }
     }
   };
@@ -64,6 +66,7 @@ export const AuthProvider = ({ children }) => {
     setToken(accessToken);
     if (typeof window !== 'undefined') {
       localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('token', accessToken);
     }
   };
 
@@ -96,8 +99,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   const isAdmin = () => user?.rol === 'admin';
-  const isProfesor = () => user?.rol === 'profesor';
-  const isDocente = () => user?.rol === 'docente';
+  const isProfesor = () => user?.rol === 'profesor' || user?.rol === 'docente';
+  const isDocente = () => user?.rol === 'docente' || user?.rol === 'profesor';
   const isEstudiante = () => user?.rol === 'estudiante';
   const getToken = () => token;
 

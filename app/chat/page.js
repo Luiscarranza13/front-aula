@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { 
   getGlobalChatMessages, sendChatMessage, getNewChatMessages,
   getUsers, getUserConversations, getPrivateChatMessages, markChatAsRead,
-  getChatUnreadCount, API_URL
+  getChatUnreadCount, getUploadUrl
 } from '@/lib/api';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { DashboardSkeleton } from '@/components/Skeleton';
 import { 
   MessageCircle, Send, Users, Globe, Search, 
-  ChevronLeft, Bell, Check, CheckCheck, Image, Smile
+  ChevronLeft, Bell, Check, CheckCheck, ImageIcon, Smile
 } from 'lucide-react';
 
 export default function ChatPage() {
@@ -206,8 +206,7 @@ export default function ChatPage() {
 
   const getAvatarUrl = (avatar) => {
     if (!avatar) return null;
-    if (avatar.startsWith('http')) return avatar;
-    return `${API_URL}/uploads/${avatar}`;
+    return getUploadUrl(avatar);
   };
 
   const getRoleColor = (rol) => {
@@ -521,7 +520,7 @@ export default function ChatPage() {
                 <Smile className="h-5 w-5" />
               </Button>
               <Button type="button" variant="ghost" size="icon" className="rounded-full text-muted-foreground hover:text-indigo-500">
-                <Image className="h-5 w-5" />
+                <ImageIcon className="h-5 w-5" />
               </Button>
               <div className="flex-1 relative">
                 <Input

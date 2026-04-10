@@ -5,8 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { 
   getCourseById, getTasksByCourse, getResourcesByCourse, getForumsByCourse,
   createTask, createResource, createForum, deleteTask, deleteResource, deleteForum,
-  getExams, getStudentExamAttempts, getStudentSubmissions,
-  API_URL
+  getExams, getStudentExamAttempts, getStudentSubmissions
 } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { CourseSkeleton } from '@/components/Skeleton';
@@ -121,7 +120,7 @@ export default function CourseDetailPage() {
       setResourceForm(prev => ({
         ...prev,
         nombre_archivo: file.originalName,
-        url: `${API_URL}${file.url}`,
+        url: file.url || '',
       }));
     }
   };

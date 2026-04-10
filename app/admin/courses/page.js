@@ -3,7 +3,26 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { getCourses, getUsers } from '@/lib/api';
+import {
+  createCourse,
+  createForum,
+  createResource,
+  createTask,
+  deleteCourse,
+  deleteForum,
+  deleteResource,
+  deleteTask,
+  getCourses,
+  getForumsByCourse,
+  getResourcesByCourse,
+  getTasksByCourse,
+  getUploadUrl,
+  getUsers,
+  updateCourse,
+  updateForum,
+  updateResource,
+  updateTask,
+} from '@/lib/api';
 import { DashboardSkeleton } from '@/components/Skeleton';
 import Modal, { ModalFooter, ConfirmModal } from '@/components/Modal';
 import FileUpload from '@/components/FileUpload';
@@ -105,11 +124,15 @@ export default function AdminCoursesPage() {
   const fetchCourseContent = async (courseId) => {
     setLoadingContent(true);
     try {
-      // Por ahora usar datos mock hasta que se implementen estos endpoints
-      setContentData({ 
-        tasks: [], 
-        resources: [], 
-        forums: [] 
+      const [tasks, resources, forums] = await Promise.all([
+        getTasksByCourse(courseId).catch(() => []),
+        getResourcesByCourse(courseId).catch(() => []),
+        getForumsByCourse(courseId).catch(() => []),
+      ]);
+      setContentData({
+        tasks,
+        resources,
+        forums,
       });
     } catch (error) {
       showNotification('Error al cargar contenido', 'error');
@@ -121,6 +144,54 @@ export default function AdminCoursesPage() {
   const showNotification = (message, type = 'success') => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 3000);
+  };
+
+  const saveCourse = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const payload = {
+        titulo: formData.titulo,
+        descripcion: formData.descripcion,
+        grado: formData.grado,
+        seccion: formData.seccion,
+        docenteId: formData.docenteId || null,
+      };
+
+      if (editingCourse) {
+        await updateCourse(editingCourse.id, payload);
+        showNotification('Curso actualizado correctamente');
+      } else {
+        await createCourse(payload);
+        showNotification('Curso creado correctamente');
+      }
+
+      await fetchData();
+      setShowModal(false);
+      setEditingCourse(null);
+      setFormData({ titulo: '', descripcion: '', grado: '', seccion: '', docenteId: '' });
+    } catch (error) {
+      showNotification('Error al guardar curso: ' + error.message, 'error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteCourseAndRefresh = async () => {
+    if (!deletingCourse) return;
+    try {
+      await deleteCourse(deletingCourse.id);
+      if (selectedCourse?.id === deletingCourse.id) {
+        setSelectedCourse(null);
+        setContentData({ tasks: [], resources: [], forums: [] });
+      }
+      await fetchData();
+      showNotification('Curso eliminado correctamente');
+    } catch (error) {
+      showNotification('Error al eliminar curso: ' + error.message, 'error');
+    }
+    setDeletingCourse(null);
+    setShowDeleteModal(false);
   };
 
   const handleSubmit = async (e) => {
@@ -262,7 +333,7 @@ export default function AdminCoursesPage() {
       setResourceForm(prev => ({
         ...prev,
         nombre_archivo: file.originalName || file.filename,
-        url: getUploadUrl(file.filename)
+        url: file.url || getUploadUrl(file.filename)
       }));
       showNotification('Archivo subido correctamente');
     }
@@ -431,7 +502,7 @@ export default function AdminCoursesPage() {
 
       {/* Modal de crear/editar curso */}
       <Modal isOpen={showModal} onClose={() => setShowModal(false)} title={editingCourse ? 'Editar Curso' : 'Nuevo Curso'} size="md">
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={saveCourse} className="space-y-5">
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Título del Curso *</label>
             <Input value={formData.titulo} onChange={(e) => setFormData({ ...formData, titulo: e.target.value })} required
@@ -737,7 +808,7 @@ export default function AdminCoursesPage() {
       </Modal>
 
       {/* Modal de confirmación de eliminación de curso */}
-      <ConfirmModal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)} onConfirm={handleDelete}
+      <ConfirmModal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)} onConfirm={deleteCourseAndRefresh}
         title="Eliminar Curso" description={`¿Estás seguro de eliminar "${deletingCourse?.titulo}"? Se eliminarán todas las tareas, recursos y foros asociados.`}
         confirmText="Eliminar" variant="danger" />
 

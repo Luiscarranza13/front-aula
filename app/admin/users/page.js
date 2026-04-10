@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { getUsers } from '@/lib/api';
+import { createUser, deleteUser, getUploadUrl, getUsers, updateUser, uploadFile } from '@/lib/api';
 import { DashboardSkeleton } from '@/components/Skeleton';
 import Modal, { ModalFooter, ConfirmModal } from '@/components/Modal';
 import { Button } from '@/components/ui/button';
@@ -54,7 +54,11 @@ export default function AdminUsersPage() {
         u.email.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    if (filterRol) filtered = filtered.filter(u => u.rol === filterRol);
+    if (filterRol === 'teacher') {
+      filtered = filtered.filter(u => u.rol === 'profesor' || u.rol === 'docente');
+    } else if (filterRol) {
+      filtered = filtered.filter(u => u.rol === filterRol);
+    }
     setFilteredUsers(filtered);
   }, [users, searchTerm, filterRol]);
 
@@ -208,7 +212,7 @@ export default function AdminUsersPage() {
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-0 shadow-sm">
           <CardContent className="p-4">
             <div className="text-3xl font-bold text-blue-600">{stats.profesores}</div>
-            <div className="text-sm text-blue-600/70">Profesores</div>
+            <div className="text-sm text-blue-600/70">Docentes</div>
           </CardContent>
         </Card>
         <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-0 shadow-sm">
@@ -230,7 +234,7 @@ export default function AdminUsersPage() {
             className="px-4 py-2 border rounded-xl bg-white dark:bg-gray-800 text-sm h-11">
             <option value="">Todos los roles</option>
             <option value="admin">Administradores</option>
-            <option value="profesor">Profesores</option>
+            <option value="teacher">Docentes y profesores</option>
             <option value="estudiante">Estudiantes</option>
           </select>
           <div className="flex border rounded-xl overflow-hidden">
@@ -418,6 +422,7 @@ export default function AdminUsersPage() {
             <select value={formData.rol} onChange={(e) => setFormData({ ...formData, rol: e.target.value })}
               className="w-full h-11 px-4 border border-gray-200 rounded-xl bg-white dark:bg-gray-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20">
               <option value="estudiante">Estudiante</option>
+              <option value="docente">Docente</option>
               <option value="profesor">Profesor</option>
               <option value="admin">Administrador</option>
             </select>
