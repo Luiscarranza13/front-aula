@@ -36,19 +36,25 @@ export const AuthProvider = ({ children }) => {
 
     initAuth();
 
-    // Escuchar cambios de sesión
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session) {
-        await loadUserProfile(session);
-      } else {
-        setUser(null);
-        setToken(null);
-      }
-    });
+    // Escuchar cambios de sesión con protección anti-crash
+    let subscription = null;
+    try {
+      const result = supabase.auth.onAuthStateChange(async (event, session) => {
+        if (session) {
+          await loadUserProfile(session);
+        } else {
+          setUser(null);
+          setToken(null);
+        }
+      });
+      subscription = result?.data?.subscription;
+    } catch (e) {
+      console.error('Error registrando listener de sesión:', e);
+    }
 
     return () => {
       clearTimeout(timer);
-      subscription.unsubscribe();
+      if (subscription?.unsubscribe) subscription.unsubscribe();
     };
   }, []);
 
