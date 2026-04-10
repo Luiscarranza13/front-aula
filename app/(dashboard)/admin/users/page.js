@@ -186,11 +186,11 @@ export default function AdminUsersPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Gestión de Usuarios</h1>
+          <h1 className="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">Gestión de Usuarios</h1>
           <p className="text-muted-foreground mt-1">{users.length} usuarios registrados</p>
         </div>
         <Button onClick={() => { setEditingUser(null); setAvatarPreview(null); setFormData({ nombre: '', email: '', password: '', rol: 'estudiante', telefono: '', avatar: '' }); setShowModal(true); }}
-          className="gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700">
+          className="gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 shadow-lg shadow-indigo-500/25 transition-all duration-300 rounded-xl">
           <UserPlus className="h-4 w-4" /> Nuevo Usuario
         </Button>
       </div>
@@ -227,21 +227,21 @@ export default function AdminUsersPage() {
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Buscar por nombre o email..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10 h-11 rounded-xl" />
+          <Input placeholder="Buscar por nombre o email..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10 h-11 rounded-xl bg-white/70 dark:bg-slate-800/70 backdrop-blur-md border-slate-200/60 dark:border-slate-700/60 focus:bg-white dark:focus:bg-slate-800 transition-all" />
         </div>
         <div className="flex gap-2">
           <select value={filterRol} onChange={(e) => setFilterRol(e.target.value)}
-            className="px-4 py-2 border rounded-xl bg-white dark:bg-gray-800 text-sm h-11">
+            className="px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white/70 dark:bg-slate-800/70 backdrop-blur-md text-sm h-11 focus:ring-2 focus:ring-indigo-500 transition-all">
             <option value="">Todos los roles</option>
             <option value="admin">Administradores</option>
             <option value="teacher">Docentes y profesores</option>
             <option value="estudiante">Estudiantes</option>
           </select>
-          <div className="flex border rounded-xl overflow-hidden">
-            <button onClick={() => setViewMode('grid')} className={`p-2.5 ${viewMode === 'grid' ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-gray-800'}`}>
+          <div className="flex border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-sm">
+            <button onClick={() => setViewMode('grid')} className={`p-2.5 transition-colors ${viewMode === 'grid' ? 'bg-indigo-600 text-white' : 'bg-white/70 dark:bg-slate-800/70 hover:bg-slate-50 dark:hover:bg-slate-700/50 backdrop-blur-md'}`}>
               <Grid3X3 className="h-4 w-4" />
             </button>
-            <button onClick={() => setViewMode('list')} className={`p-2.5 ${viewMode === 'list' ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-gray-800'}`}>
+            <button onClick={() => setViewMode('list')} className={`p-2.5 transition-colors ${viewMode === 'list' ? 'bg-indigo-600 text-white' : 'bg-white/70 dark:bg-slate-800/70 hover:bg-slate-50 dark:hover:bg-slate-700/50 backdrop-blur-md'}`}>
               <List className="h-4 w-4" />
             </button>
           </div>
@@ -254,7 +254,7 @@ export default function AdminUsersPage() {
           {filteredUsers.map((user) => {
             const roleConfig = getRoleConfig(user.rol);
             return (
-              <Card key={user.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group border-0 shadow-md">
+              <Card key={user.id} className="overflow-hidden hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500 hover:-translate-y-2 group bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/60 dark:border-slate-700/60">
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-4">
                     <Avatar className="h-16 w-16 ring-4 ring-white dark:ring-gray-800 shadow-lg">
@@ -301,7 +301,7 @@ export default function AdminUsersPage() {
           })}
         </div>
       ) : (
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border-0 shadow-md overflow-hidden">
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-white/20 shadow-xl overflow-hidden">
           <table className="w-full">
             <thead className="bg-gray-50 dark:bg-gray-900">
               <tr>
@@ -316,7 +316,7 @@ export default function AdminUsersPage() {
               {filteredUsers.map((user) => {
                 const roleConfig = getRoleConfig(user.rol);
                 return (
-                  <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                  <tr key={user.id} className="hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20 transition-colors">
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10">

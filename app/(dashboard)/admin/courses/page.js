@@ -194,22 +194,6 @@ export default function AdminCoursesPage() {
     setShowDeleteModal(false);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSaving(true);
-    try {
-      // Por ahora mostrar mensaje de funcionalidad no disponible
-      showNotification('Funcionalidad de creación/edición no disponible aún', 'error');
-      setShowModal(false);
-      setEditingCourse(null);
-      setFormData({ titulo: '', descripcion: '', grado: '', seccion: '', docenteId: '' });
-    } catch (error) {
-      showNotification('Error al guardar curso: ' + error.message, 'error');
-    } finally {
-      setSaving(false);
-    }
-  };
-
   const handleEdit = (course) => {
     setEditingCourse(course);
     setFormData({
@@ -220,17 +204,6 @@ export default function AdminCoursesPage() {
       docenteId: course.docenteId || '',
     });
     setShowModal(true);
-  };
-
-  const handleDelete = async () => {
-    if (!deletingCourse) return;
-    try {
-      showNotification('Funcionalidad de eliminación no disponible aún', 'error');
-    } catch (error) {
-      showNotification('Error al eliminar curso: ' + error.message, 'error');
-    }
-    setDeletingCourse(null);
-    setShowDeleteModal(false);
   };
 
   const openContentManager = (course) => {
@@ -373,11 +346,11 @@ export default function AdminCoursesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Gestión de Cursos</h1>
+          <h1 className="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">Gestión de Cursos</h1>
           <p className="text-muted-foreground mt-1">{courses.length} cursos en total</p>
         </div>
         <Button onClick={() => { setEditingCourse(null); setFormData({ titulo: '', descripcion: '', grado: '', seccion: '', docenteId: '' }); setShowModal(true); }}
-          className="gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700">
+          className="gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 shadow-lg shadow-indigo-500/25 transition-all duration-300 rounded-xl">
           <Plus className="h-4 w-4" /> Nuevo Curso
         </Button>
       </div>
@@ -386,19 +359,19 @@ export default function AdminCoursesPage() {
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Buscar cursos..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10" />
+          <Input placeholder="Buscar cursos..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10 h-11 rounded-xl bg-white/70 dark:bg-slate-800/70 backdrop-blur-md border-slate-200/60 dark:border-slate-700/60 focus:bg-white dark:focus:bg-slate-800 transition-all" />
         </div>
         <div className="flex gap-2">
           <select value={filterGrado} onChange={(e) => setFilterGrado(e.target.value)}
-            className="px-3 py-2 border rounded-lg bg-white dark:bg-gray-800 text-sm">
+            className="px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white/70 dark:bg-slate-800/70 backdrop-blur-md text-sm focus:ring-2 focus:ring-indigo-500 transition-all">
             <option value="">Todos los grados</option>
             {uniqueGrados.map(grado => <option key={grado} value={grado}>{grado}</option>)}
           </select>
-          <div className="flex border rounded-lg overflow-hidden">
-            <button onClick={() => setViewMode('grid')} className={`p-2 ${viewMode === 'grid' ? 'bg-primary text-white' : 'bg-white dark:bg-gray-800'}`}>
+          <div className="flex border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-sm">
+            <button onClick={() => setViewMode('grid')} className={`p-2.5 transition-colors ${viewMode === 'grid' ? 'bg-indigo-600 text-white' : 'bg-white/70 dark:bg-slate-800/70 hover:bg-slate-50 dark:hover:bg-slate-700/50 backdrop-blur-md'}`}>
               <Grid3X3 className="h-4 w-4" />
             </button>
-            <button onClick={() => setViewMode('list')} className={`p-2 ${viewMode === 'list' ? 'bg-primary text-white' : 'bg-white dark:bg-gray-800'}`}>
+            <button onClick={() => setViewMode('list')} className={`p-2.5 transition-colors ${viewMode === 'list' ? 'bg-indigo-600 text-white' : 'bg-white/70 dark:bg-slate-800/70 hover:bg-slate-50 dark:hover:bg-slate-700/50 backdrop-blur-md'}`}>
               <List className="h-4 w-4" />
             </button>
           </div>
@@ -409,7 +382,7 @@ export default function AdminCoursesPage() {
       {viewMode === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCourses.map((course, idx) => (
-            <Card key={course.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
+            <Card key={course.id} className="overflow-hidden hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500 hover:-translate-y-2 group bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/60 dark:border-slate-700/60">
               <div className={`h-28 bg-gradient-to-br ${colors[idx % colors.length]} relative overflow-hidden`}>
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
                 <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full" />
@@ -461,7 +434,7 @@ export default function AdminCoursesPage() {
           ))}
         </div>
       ) : (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border overflow-hidden">
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-white/20 shadow-xl overflow-hidden">
           <table className="w-full">
             <thead className="bg-gray-50 dark:bg-gray-900">
               <tr>
@@ -473,7 +446,7 @@ export default function AdminCoursesPage() {
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
               {filteredCourses.map((course) => (
-                <tr key={course.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                <tr key={course.id} className="hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20 transition-colors">
                   <td className="px-4 py-3 font-medium">{course.titulo}</td>
                   <td className="px-4 py-3 text-sm text-muted-foreground">{course.grado} - {course.seccion}</td>
                   <td className="px-4 py-3 text-sm">{course.docente?.nombre || <span className="text-orange-600">Sin asignar</span>}</td>

@@ -222,18 +222,18 @@ export default function SubmissionsPage() {
       )}
 
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-          <ClipboardList className="h-8 w-8 text-indigo-600" /> Libro de Calificaciones
+        <h1 className="text-4xl font-extrabold tracking-tight flex items-center gap-3 bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
+          <ClipboardList className="h-8 w-8 text-indigo-600 dark:text-indigo-400" /> Libro de Calificaciones
         </h1>
         {selectedCourse && students.length > 0 && (
-          <Button onClick={saveAllGrades} disabled={saving} className="gap-2 bg-indigo-600 hover:bg-indigo-700">
+          <Button onClick={saveAllGrades} disabled={saving} className="gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 shadow-lg shadow-indigo-500/25 transition-all duration-300 rounded-xl">
             <Save className="h-4 w-4" /> {saving ? 'Guardando...' : 'Guardar Todo'}
           </Button>
         )}
       </div>
 
       {/* Selector de Curso */}
-      <Card>
+      <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-white/20 shadow-lg rounded-2xl overflow-hidden">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2">
             <BookOpen className="h-5 w-5" /> Seleccionar Curso
@@ -266,8 +266,8 @@ export default function SubmissionsPage() {
                   onClick={() => loadCourseData(course)}
                   className={`p-4 rounded-xl text-left transition-all ${
                     isSelected 
-                      ? 'bg-indigo-600 text-white shadow-lg ring-2 ring-indigo-600' 
-                      : 'bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border'
+                      ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/25 scale-[1.02]' 
+                      : 'bg-white/70 dark:bg-slate-800/70 hover:bg-slate-50 dark:hover:bg-slate-700/50 border border-slate-200/60 dark:border-slate-700/60 backdrop-blur-md hover:-translate-y-1 hover:shadow-md'
                   }`}
                 >
                   <p className="font-semibold text-sm line-clamp-1">{course.titulo}</p>
@@ -284,7 +284,7 @@ export default function SubmissionsPage() {
 
       {/* Tabla de Calificaciones */}
       {selectedCourse && (
-        <Card>
+        <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-white/20 shadow-xl rounded-2xl overflow-hidden mt-6">
           <CardHeader className="pb-3 border-b">
             <div className="flex items-center justify-between">
               <div>
@@ -323,8 +323,8 @@ export default function SubmissionsPage() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="bg-gray-50 dark:bg-gray-800 border-b">
-                      <th className="text-left p-4 font-semibold text-sm sticky left-0 bg-gray-50 dark:bg-gray-800 min-w-[200px]">
+                    <tr className="bg-gray-50/80 dark:bg-gray-900/80 backdrop-blur-md border-b">
+                      <th className="text-left p-4 font-semibold text-sm sticky left-0 bg-gray-50/90 dark:bg-gray-900/90 backdrop-blur-md min-w-[200px] z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                         Estudiante
                       </th>
                       {courseTasks.map(task => (
@@ -346,8 +346,8 @@ export default function SubmissionsPage() {
                     {students.map((student, idx) => {
                       const average = calculateAverage(student.id);
                       return (
-                        <tr key={student.id} className={`border-b ${idx % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50/50 dark:bg-gray-800/50'}`}>
-                          <td className="p-4 sticky left-0 bg-inherit">
+                        <tr key={student.id} className={`border-b transition-colors hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20 ${idx % 2 === 0 ? 'bg-white/40 dark:bg-gray-900/40' : 'bg-gray-50/40 dark:bg-gray-800/40'}`}>
+                          <td className="p-4 sticky left-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
                             <div className="flex items-center gap-3">
                               <div className="h-8 w-8 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-300 font-semibold text-sm">
                                 {student.nombre?.charAt(0) || 'E'}
@@ -376,9 +376,9 @@ export default function SubmissionsPage() {
                                     className={`w-16 text-center text-sm h-8 ${
                                       hasValue 
                                         ? parseFloat(gradeData.calificacion) >= 11 
-                                          ? 'bg-green-50 border-green-300 text-green-700' 
-                                          : 'bg-red-50 border-red-300 text-red-700'
-                                        : ''
+                                          ? 'bg-green-50/80 border-green-300 text-green-700 shadow-inner' 
+                                          : 'bg-red-50/80 border-red-300 text-red-700 shadow-inner'
+                                        : 'bg-white/50 dark:bg-slate-800/50 focus:bg-white dark:focus:bg-slate-800'
                                     }`}
                                   />
                                 </div>

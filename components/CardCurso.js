@@ -41,7 +41,7 @@ export default function CardCurso({ curso }) {
     <Link href={`/courses/${curso.id}`} className="block group">
       <Card className="overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer border-0 shadow-md">
         {/* Header con gradiente */}
-        <div className={`h-32 md:h-36 bg-gradient-to-br ${color.bg} relative overflow-hidden`}>
+        <div className={`h-28 md:h-32 bg-gradient-to-br ${color.bg} relative overflow-hidden`}>
           {/* Patrón decorativo */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute -right-8 -top-8 w-32 h-32 bg-white rounded-full" />
@@ -52,33 +52,33 @@ export default function CardCurso({ curso }) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
           
           {/* Contenido del header */}
-          <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4">
+          <div className="absolute bottom-0 left-0 right-0 p-3">
             <Badge className="mb-1.5 md:mb-2 bg-white/20 text-white border-0 backdrop-blur-sm text-[10px] md:text-xs">
               <GraduationCap className="h-2.5 w-2.5 md:h-3 md:w-3 mr-1" />
               {curso.grado} - {curso.seccion}
             </Badge>
-            <h3 className="text-white font-bold text-base md:text-lg line-clamp-2 group-hover:underline decoration-2 underline-offset-2">
+            <h3 className="text-white font-bold text-sm md:text-base line-clamp-2 group-hover:underline decoration-2 underline-offset-2">
               {curso.titulo}
             </h3>
           </div>
           
           {/* Flecha de navegación */}
-          <div className="absolute top-3 md:top-4 right-3 md:right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
-            <div className="bg-white/20 backdrop-blur-sm rounded-full p-1.5 md:p-2">
-              <ArrowRight className="h-3 w-3 md:h-4 md:w-4 text-white" />
+          <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
+            <div className="bg-white/20 backdrop-blur-sm rounded-full p-1.5">
+              <ArrowRight className="h-3 w-3 text-white" />
             </div>
           </div>
         </div>
         
-        <CardContent className="p-3 md:p-4 space-y-3 md:space-y-4">
+        <CardContent className="p-3 space-y-3">
           {/* Docente */}
           {curso.docente && (
-            <div className="flex items-center gap-2 md:gap-3">
-              <div className="h-7 w-7 md:h-8 md:w-8 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center text-xs md:text-sm font-medium">
+            <div className="flex items-center gap-2.5">
+              <div className="h-7 w-7 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center text-xs font-medium">
                 {curso.docente.nombre?.charAt(0) || 'D'}
               </div>
               <div>
-                <p className="text-xs md:text-sm font-medium text-gray-900 dark:text-white">
+                <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
                   {curso.docente.nombre}
                 </p>
                 <p className="text-[10px] md:text-xs text-muted-foreground">Docente</p>
@@ -87,12 +87,12 @@ export default function CardCurso({ curso }) {
           )}
           
           {/* Barra de progreso */}
-          <div className="space-y-1.5 md:space-y-2">
+          <div className="space-y-1.5">
             <div className="flex justify-between text-[10px] md:text-xs">
               <span className="text-muted-foreground">Progreso del curso</span>
               <span className="font-medium text-gray-900 dark:text-white">{progress}%</span>
             </div>
-            <div className="h-1.5 md:h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div className="h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
               <div 
                 className={`h-full bg-gradient-to-r ${color.bg} rounded-full transition-all duration-500`}
                 style={{ width: `${progress}%` }}
@@ -101,13 +101,13 @@ export default function CardCurso({ curso }) {
           </div>
           
           {/* Stats */}
-          <div className="flex items-center justify-between pt-1.5 md:pt-2 border-t border-gray-100 dark:border-gray-700">
-            <div className="flex items-center gap-1 md:gap-1.5 text-[10px] md:text-xs text-muted-foreground">
-              <CheckCircle2 className="h-3 w-3 md:h-3.5 md:w-3.5 text-green-500" />
+          <div className="flex items-center justify-between pt-1.5 border-t border-gray-100 dark:border-gray-700">
+            <div className="flex items-center gap-1 text-[10px] md:text-xs text-muted-foreground">
+              <CheckCircle2 className="h-3 w-3 text-green-500" />
               <span>{tasksCompleted}/{totalTasks} tareas</span>
             </div>
             <Badge variant="outline" className={`text-[10px] md:text-xs ${color.light} border-0`}>
-              <BookOpen className="h-2.5 w-2.5 md:h-3 md:w-3 mr-1" />
+              <BookOpen className="h-2.5 w-2.5 mr-1" />
               Activo
             </Badge>
           </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { getCourses, diagnosticBackend, checkConnectivity } from '@/lib/api-ultra';
 import CardCurso from '@/components/CardCurso';
 import { DashboardSkeleton } from '@/components/Skeleton';
@@ -8,13 +9,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-  BookOpen, Search, Grid3X3, List, GraduationCap, Users, 
+import {
+  BookOpen, Search, Grid3X3, List, GraduationCap, Users,
   RefreshCw, AlertTriangle, CheckCircle, Wifi, WifiOff,
   Settings, Info, ExternalLink, Clock
 } from 'lucide-react';
 
 export default function CoursesPageUltra() {
+  const router = useRouter();
   const [courses, setCourses] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -32,23 +34,23 @@ export default function CoursesPageUltra() {
   const fetchCourses = async (showLoader = true) => {
     if (showLoader) setLoading(true);
     setRefreshing(!showLoader);
-    
+
     console.log('🚀 === INICIANDO CARGA DE CURSOS ULTRA ===');
-    
+
     try {
       // Verificar conectividad primero
       const connStatus = await checkConnectivity();
       setConnectivity(connStatus);
-      
+
       // Cargar cursos
       const data = await getCourses();
       console.log('✅ Cursos recibidos:', data);
-      
+
       setCourses(data);
       setFilteredCourses(data);
       setError('');
       setLastUpdate(new Date());
-      
+
     } catch (err) {
       console.error('❌ Error en componente de cursos:', err);
       setError(err.message);
@@ -82,19 +84,19 @@ export default function CoursesPageUltra() {
   // Filtrar cursos
   useEffect(() => {
     let filtered = [...courses];
-    
+
     if (searchTerm) {
-      filtered = filtered.filter(c => 
+      filtered = filtered.filter(c =>
         c.titulo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         c.docente?.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         c.descripcion?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    
+
     if (filterGrado) {
       filtered = filtered.filter(c => c.grado === filterGrado);
     }
-    
+
     setFilteredCourses(filtered);
   }, [courses, searchTerm, filterGrado]);
 
@@ -141,10 +143,10 @@ export default function CoursesPageUltra() {
             </p>
           )}
         </div>
-        
+
         <div className="flex flex-wrap gap-2">
-          <Button 
-            onClick={() => fetchCourses(false)} 
+          <Button
+            onClick={() => fetchCourses(false)}
             disabled={refreshing}
             variant="outline"
             size="sm"
@@ -153,8 +155,8 @@ export default function CoursesPageUltra() {
             <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
             {refreshing ? 'Actualizando...' : 'Actualizar'}
           </Button>
-          
-          <Button 
+
+          <Button
             onClick={runDiagnostic}
             variant="outline"
             size="sm"
@@ -163,8 +165,8 @@ export default function CoursesPageUltra() {
             <Settings className="h-4 w-4" />
             Diagnóstico
           </Button>
-          
-          <Button 
+
+          <Button
             onClick={() => window.open('https://backend-aula-production.up.railway.app/courses', '_blank')}
             variant="outline"
             size="sm"
@@ -211,7 +213,7 @@ export default function CoursesPageUltra() {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="p-3 md:p-4 flex items-center gap-2 md:gap-3">
             <div className="p-1.5 md:p-2 rounded-lg bg-purple-100 dark:bg-purple-950">
@@ -223,7 +225,7 @@ export default function CoursesPageUltra() {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="p-3 md:p-4 flex items-center gap-2 md:gap-3">
             <div className="p-1.5 md:p-2 rounded-lg bg-green-100 dark:bg-green-950">
@@ -235,7 +237,7 @@ export default function CoursesPageUltra() {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="p-3 md:p-4 flex items-center gap-2 md:gap-3">
             <div className="p-1.5 md:p-2 rounded-lg bg-indigo-100 dark:bg-indigo-950">
@@ -278,15 +280,15 @@ export default function CoursesPageUltra() {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button 
-                  onClick={() => fetchCourses()} 
+                <Button
+                  onClick={() => fetchCourses()}
                   size="sm"
                   variant="outline"
                   className="text-red-600 border-red-300 hover:bg-red-50"
                 >
                   Reintentar
                 </Button>
-                <Button 
+                <Button
                   onClick={runDiagnostic}
                   size="sm"
                   variant="outline"
@@ -309,7 +311,7 @@ export default function CoursesPageUltra() {
                 <Info className="h-5 w-5" />
                 Diagnóstico del Sistema
               </CardTitle>
-              <Button 
+              <Button
                 onClick={() => setShowDiagnostic(false)}
                 variant="ghost"
                 size="sm"
@@ -394,7 +396,7 @@ export default function CoursesPageUltra() {
               {searchTerm || filterGrado ? 'No se encontraron cursos' : 'No hay cursos disponibles'}
             </h3>
             <p className="text-muted-foreground text-center max-w-md">
-              {searchTerm || filterGrado 
+              {searchTerm || filterGrado
                 ? 'Intenta ajustar los filtros de búsqueda para encontrar más cursos.'
                 : 'Los cursos aparecerán aquí cuando estén disponibles. Verifica la conexión con el backend.'}
             </p>
@@ -430,10 +432,10 @@ export default function CoursesPageUltra() {
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                 {filteredCourses.map((curso) => (
-                  <tr 
-                    key={curso.id} 
+                  <tr
+                    key={curso.id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
-                    onClick={() => window.location.href = `/courses/${curso.id}`}
+                    onClick={() => router.push(`/courses/${curso.id}`)}
                   >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">

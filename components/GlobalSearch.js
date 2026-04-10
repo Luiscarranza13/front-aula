@@ -62,14 +62,14 @@ export default function GlobalSearch({ isOpen, onClose }) {
   return (
     <div className="fixed inset-0 z-50">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative max-w-2xl mx-auto mt-20 p-4">
+      <div className="relative max-w-xl mx-auto mt-16 p-3">
         <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden">
           {/* Search Input */}
-          <div className="flex items-center gap-3 p-4 border-b">
+          <div className="flex items-center gap-3 p-3 border-b">
             <Search className="h-5 w-5 text-muted-foreground" />
             <Input ref={inputRef} value={query} onChange={(e) => setQuery(e.target.value)}
               placeholder="Buscar cursos, tareas, foros, usuarios..."
-              className="border-0 focus-visible:ring-0 text-lg" />
+              className="border-0 focus-visible:ring-0 text-base" />
             {loading && <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />}
             <button onClick={onClose} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded">
               <X className="h-5 w-5" />
@@ -80,7 +80,7 @@ export default function GlobalSearch({ isOpen, onClose }) {
           <div className="max-h-[60vh] overflow-auto">
             {query.length < 2 ? (
               <div className="p-8 text-center text-muted-foreground">
-                <Search className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                <Search className="h-10 w-10 mx-auto mb-3 opacity-50" />
                 <p>Escribe al menos 2 caracteres para buscar</p>
               </div>
             ) : !hasResults && !loading ? (
