@@ -39,14 +39,16 @@ export default function GradesPage() {
       
       // Cargar tareas de todos los cursos para mostrar el conteo
       const tasksByCourse = {};
-      for (const course of coursesData) {
-        try {
-          const tasks = await getTasksByCourse(course.id).catch(() => []);
-          tasksByCourse[course.id] = tasks;
-        } catch (e) {
-          tasksByCourse[course.id] = [];
-        }
-      }
+      const courseTaskPromises = coursesData.map(course => 
+        getTasksByCourse(course.id)
+          .then(tasks => ({ id: course.id, tasks }))
+          .catch(() => ({ id: course.id, tasks: [] }))
+      );
+      
+      const results = await Promise.all(courseTaskPromises);
+      results.forEach(res => {
+        tasksByCourse[res.id] = res.tasks;
+      });
       setAllTasksByCourse(tasksByCourse);
       
       // Si hay cursos, seleccionar el primero por defecto

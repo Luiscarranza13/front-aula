@@ -24,20 +24,18 @@ export default function ForumPage() {
       try {
         const coursesData = await getCourses();
         setCourses(coursesData);
-        const allForums = [];
-        
-        for (const course of coursesData) {
-          try {
-            const courseForums = await getForumsByCourse(course.id);
-            allForums.push(...courseForums.map(forum => ({
+        const forumPromises = coursesData.map(course => 
+          getForumsByCourse(course.id)
+            .then(forums => forums.map(forum => ({
               ...forum,
               courseName: course.titulo,
               courseId: course.id
-            })));
-          } catch (e) {
-            console.log('No forums for course', course.id);
-          }
-        }
+            })))
+            .catch(() => [])
+        );
+        
+        const results = await Promise.all(forumPromises);
+        const allForums = results.flat();
         
         setForums(allForums);
         setFilteredForums(allForums);

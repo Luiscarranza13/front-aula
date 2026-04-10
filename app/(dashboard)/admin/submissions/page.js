@@ -44,17 +44,19 @@ export default function SubmissionsPage() {
       setTasks(tasksData || []);
       setCourses(coursesData || []);
       
-      // Cargar tareas por curso para mostrar el conteo correcto
+      // Cargar tareas por curso de manera paralela en lugar de secuencial para optimizar carga
       const tasksByCourseMap = {};
       if (coursesData && coursesData.length > 0) {
-        for (const course of coursesData) {
-          try {
-            const courseTasks = await getTasksByCourse(course.id).catch(() => []);
-            tasksByCourseMap[course.id] = courseTasks;
-          } catch (e) {
-            tasksByCourseMap[course.id] = [];
-          }
-        }
+        const courseTaskPromises = coursesData.map(course => 
+          getTasksByCourse(course.id)
+            .then(tasks => ({ id: course.id, tasks }))
+            .catch(() => ({ id: course.id, tasks: [] }))
+        );
+        
+        const results = await Promise.all(courseTaskPromises);
+        results.forEach(res => {
+          tasksByCourseMap[res.id] = res.tasks;
+        });
       }
       setTasksByCourse(tasksByCourseMap);
     } catch (error) {

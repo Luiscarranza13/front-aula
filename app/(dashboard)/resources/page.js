@@ -28,20 +28,19 @@ export default function ResourcesPage() {
       try {
         const coursesData = await getCourses();
         setCourses(coursesData);
-        const allResources = [];
         
-        for (const course of coursesData) {
-          try {
-            const courseResources = await getResourcesByCourse(course.id);
-            allResources.push(...courseResources.map(resource => ({
+        const resourcePromises = coursesData.map(course => 
+          getResourcesByCourse(course.id)
+            .then(resources => resources.map(resource => ({
               ...resource,
               courseName: course.titulo,
               courseId: course.id
-            })));
-          } catch (e) {
-            console.log('No resources for course', course.id);
-          }
-        }
+            })))
+            .catch(() => [])
+        );
+        
+        const results = await Promise.all(resourcePromises);
+        const allResources = results.flat();
         
         setResources(allResources);
         setFilteredResources(allResources);
