@@ -35,16 +35,14 @@ export default function CoursesPage() {
     if (showLoader) setLoading(true);
     setRefreshing(!showLoader);
 
-    console.log('🚀 === INICIANDO CARGA DE CURSOS ULTRA ===');
-
     try {
-      // Verificar conectividad primero
-      const connStatus = await checkHealth();
-      setConnectivity(connStatus);
+      // Verificar conectividad en background sin bloquear la carga rápida
+      checkHealth()
+        .then(setConnectivity)
+        .catch(err => setConnectivity({ connected: false, message: err.message }));
 
       // Cargar cursos
       const data = await getCourses();
-      console.log('✅ Cursos recibidos:', data);
 
       setCourses(data);
       setFilteredCourses(data);
@@ -52,7 +50,6 @@ export default function CoursesPage() {
       setLastUpdate(new Date());
 
     } catch (err) {
-      console.error('❌ Error en componente de cursos:', err);
       setError(err.message);
       setConnectivity({ connected: false, message: err.message });
     } finally {
